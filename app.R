@@ -3,7 +3,7 @@ library(ggplot2)
 library(shiny)
 library(shinydashboard)
 
-table_resultats <- read_excel("J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_resultats.xlsx")
+table_resultats <- read_excel("https://github.com/Pelras-A/test/blob/main/table_resultats.xlsx")
 nb_ech_bootstrap <- 1000
 nb_BDD_completes <- 5
 TIME <- data.frame(time = c(0.1973684,  0.2960526,  0.3618421,  0.3947368,  0.4605263,  0.4934211,  0.5592105,  0.6250000,  0.7565789,
