@@ -1,0 +1,15 @@
+;AVG;non_nul
+Age_L3;-0,002677282;52,1
+Sexe;0,168494173;77,2
+Resection.primitif;-0,357948648;96,5
+Protocole_L1groupebis;0,022752092;35,3
+Epuisement.therap;0,216359272;76
+OMS_L3.regroupe;0,382816472;96,7
+Carcinose_L3;0,023070367;37
+Meta.pulm_L3;0,030290757;36,7
+Nbre.de.site.metastatique_dg_1;0,036636794;39,5
+Nbre.de.site.metastatique_dg_2etplu;-0,037007126;34,3
+Meta.hep_L3_isolee;0,189987639;52,4
+Meta.hep_L3_non;-0,251213361;86,5
+log_SSP1;-0,052847869;48,4
+log_SSP2;-0,243748481;98,2
