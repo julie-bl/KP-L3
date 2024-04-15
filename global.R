@@ -1,4 +1,4 @@
-#tata
+#tata 2
 model_final <- function(X){
   
   model <- X
