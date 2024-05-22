@@ -12,7 +12,7 @@ library(RSelenium)
 
 ##########################################TEMP###############################################
 load("RES.RData")
-table_resultats <- read.csv("table_resultats.csv")
+table_resultats <- read.csv("table_resultats.csv", sep = ";")
 tmp <- table_resultats$X
 table_resultats <- data.frame(table_resultats[,-1])
 row.names(table_resultats) <- tmp
@@ -106,31 +106,12 @@ ui <- dashboardPage(
                     
                         box(title = "Predicted survival curve",
                             plotlyOutput("KM"),
-                            verbatimTextOutput("EV"),
-                            downloadButton("png","Download in PNG", class = "pull-right"))
-                        
-                      
+                            div(style = "height:50px"),
+                            verbatimTextOutput("EV"))
                     )
             )
         )
     )
-                        
-                    
-                        
-                        #box(title = "Esperance de vie",
-                        #    ),
-                        
-#                        box(title = "Table",
-#                            dataTableOutput("table_pred"),
-#                            height = 450,
-#                            column(2,align = "center",downloadButton("csv","Download in CSV", class = "butt")))
-
-        
-
-
-
-
-
 
 server <- function(input, output){
     
@@ -179,16 +160,6 @@ server <- function(input, output){
           width = 600,
           height = 700))
       add_lines(graphic, line= list(shape = 'hv'))
-      
-      
-        
-        # ggplotly(ggplot(model_final(X)$table,aes(x = round(time,digits = 2), y = round(pred,digits = 3))) +
-        #              geom_step(color ="dodgerblue1" ) +
-        #              labs(
-        #                  x = "Survival time (months)",
-        #                  y = "Progression-free survival") + 
-        #              theme_linedraw() +
-        #              ylim(c(0,1)))
     }
     
     x <- reactive(input$NMSD)
