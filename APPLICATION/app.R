@@ -25,12 +25,12 @@ TIME <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICAT
 #Free progression survival
 
 load(url("https://github.com/Pelras-A/KP-L3/raw/main/APPLICATION/RES_SP.RData"))
-table_resultats <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/table_resultats_SP.csv")
+table_resultats_SP <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/table_resultats_SP.csv")
 tmp <- table_resultats_SP$X
 table_resultats_SP <- data.frame(table_resultats_SP[,-1])
 row.names(table_resultats_SP) <- tmp
 rm(tmp)
-TIME <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/TIME_SP.csv")
+TIME_SP <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/TIME_SP.csv")
 
 
 
@@ -195,9 +195,9 @@ server <- function(input, output){
                        type = "s"))
   
   output$EV <- renderText(paste0("Life expectancy = ", round(MST(), digits = 1), " month(s)", "\n", "\n",
-                                 "Survival at 3 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[63,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Survival at 6 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[89,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Survival at 12 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[106,"time"],"pred"], digits = 3)))
+                                 "Survival at 3 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[50,"time"],"pred"], digits = 3), "\n", "\n",
+                                 "Survival at 6 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[94,"time"],"pred"], digits = 3), "\n", "\n",
+                                 "Survival at 12 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[136,"time"],"pred"], digits = 3)))
   
   
   
@@ -217,9 +217,9 @@ server <- function(input, output){
                        type = "s"))
   
   output$EV_SP <- renderText(paste0("Life expectancy without progression = ", round(MST_SP(), digits = 1), " month(s)", "\n", "\n",
-                                 "Free-progression survival at 3 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME[63,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Free-progression survival at 6 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME[89,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Free-progression survival at 12 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME[106,"time"],"pred"], digits = 3)))
+                                 "Free-progression survival at 3 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[63,"time"],"pred"], digits = 3), "\n", "\n",
+                                 "Free-progression survival at 6 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[89,"time"],"pred"], digits = 3), "\n", "\n",
+                                 "Free-progression survival at 12 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[106,"time"],"pred"], digits = 3)))
   
   observeEvent(input$btn_go, {
     shinyjs::show(id = "hiddenbox")
