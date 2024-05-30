@@ -1,0 +1,498 @@
+---
+title: "RESULTATS"
+author: "Antoine Pelras"
+date: "07/03/2024"
+output: html_document
+---
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(crayon)
+library(survival)
+library(openxlsx)
+library(RISCA)
+```
+
+```{r}
+load("J:/4-Méthodologiste/Antoine/pancreas/Resultats/RES.RData")
+table_LASSO <- read_excel("J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_LASSO.xlsx")[,-1]
+table_resultats <- read_excel("J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_resultats.xlsx")
+tmp <- table_resultats$...1
+table_resultats <- data.frame(table_resultats[,-1])
+row.names(table_resultats) <- tmp
+
+data <- read_excel("J:/4-Méthodologiste/Antoine/pancreas/data.xlsx")
+
+nb_ech_bootstrap = 1000
+nb_BDD_completes = 5
+TIME <- data.frame(time = sort(unique(data$time)))
+```
+
+**Analyse Univarie**
+
+```{r}
+HR_tmp <- data.frame(matrix(RES$AU,ncol = 13, byrow = TRUE))
+HR_moy <- sapply(HR_tmp, mean)
+```
+
+
+**Modele final**
+
+```{r}
+model_final <- function(X){
+  
+  model <- X
+
+  for(cov in names(X)){
+    
+    model[,cov] <- X[,cov]*table_resultats[cov,"AVG"]
+
+  }
+  
+  sum.model <- rowSums(model, na.rm = TRUE)
+
+  pred.temp <- 0
+  
+  for(i in 1:(nb_ech_bootstrap*nb_BDD_completes)){
+    
+    tmp <- exp(matrix(exp(sum.model))%*%t(as.matrix(-1*RES$H0B[,i+1])))
+    tmp[is.na(tmp)] <- 1
+    pred.temp <- pred.temp + tmp
+    
+  }
+  
+  pred <- pred.temp/(nb_ech_bootstrap*nb_BDD_completes)
+  
+  
+  table.temp <- data.frame(time = c(0,TIME$time), pred = c(1,pred[1,]))
+  
+  median <- table.temp[table.temp$pred==max(table.temp[table.temp$pred<=0.5,]$pred),]$time
+  
+  list(model = sum.model, table = table.temp, median = median)
+  
+}
+```
+
+
+```{r}
+graph <- function(X, median){
+  
+  if(median == TRUE){
+    
+    ggplot(model_final(X)$table, aes(x = time, y = pred)) +
+      geom_step(color ="dodgerblue1" )+
+      labs(
+        x = "Survival time (months)",
+        y = "Progression-free survival") +
+      geom_segment(aes(x=model_final(X)$median, xend=model_final(X)$median, y=-Inf,  yend= 0.5),  linetype=2) +
+      geom_segment(aes(x=-Inf, xend=model_final(X)$median, y=0.5, yend=0.5),  linetype=2) +
+      theme_minimal() +
+      ylim(c(0,1))
+    
+  }else{
+    
+    ggplot(model_final(X)$table,aes(x = time, y = pred)) +
+      geom_step(color ="dodgerblue1" )+
+      labs(
+        x = "Survival time (months)",
+        y = "Progression-free survival") + 
+      theme_minimal() +
+      ylim(c(0,1))
+    
+  }
+  
+}
+
+
+#exemple avec un patient fictif :
+
+X <- data.frame(Sexe = 1,
+                Resection.primitif = 1,
+                Age_L3 = NA,
+                log_SSP2=log(NA),
+                Nbre.de.site.metastatique_dg_1=1,
+                Nbre.de.site.metastatique_dg_2etplu=1)
+yo <- model_final(X)$table
+
+Y <- data.frame(Sexe = 0,
+                Resection.primitif = 0,
+                Age_L3 = 40,
+                log_SSP2=log(500),
+                Nbre.de.site.metastatique_dg_1=1,
+                Nbre.de.site.metastatique_dg_2etplu=1)
+model_final(Y)$table
+
+graph(X, FALSE)
+graph(Y, FALSE)
+```
+
+
+**Resultats**
+```{r}
+#temps moyen estime par Aire sous la courbe de survie
+round(mean(RES$RMST), digits = 2)
+
+#IC de Aire sous la courbe de survie
+round(quantile(RES$RMST, probs = c(0.025, 0.975), na.rm = T),4)
+```
+
+
+**METRIQUES**
+```{r}
+##############       Brier score 1 mois       ##############
+
+cat(green("Brier score 1 mois
+          "))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$Brier_1mois_train),4))
+quantile(RES$Brier_1mois_train, probs=c(0.025, 0.975))
+
+cat(red("
+validation
+"))
+paste("AVG : ", round(mean(RES$Brier_3mois_val),4))
+quantile(RES$Brier_3mois_val, probs=c(0.025, 0.975))
+
+##############       Brier score 3 mois       ##############
+
+cat(green("Brier score 3 mois
+          "))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$Brier_3mois_train),4))
+quantile(RES$Brier_3mois_train, probs=c(0.025, 0.975))
+
+cat(red("
+validation
+"))
+paste("AVG : ", round(mean(RES$Brier_3mois_val),4))
+quantile(RES$Brier_3mois_val, probs=c(0.025, 0.975))
+
+##############       Brier score 6 mois       ##############
+
+cat(green("Brier score 6 mois
+          "))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$Brier_6mois_train),4))
+quantile(RES$Brier_6mois_train, probs=c(0.025, 0.975))
+
+cat(red("
+validation
+"))
+paste("AVG : ", round(mean(RES$Brier_3mois_val),4))
+quantile(RES$Brier_3mois_val, probs=c(0.025, 0.975))
+
+##############       Brier score integer      ##############
+
+cat(green("
+Brier score integer
+"))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$Brier_integer_train),4))
+quantile(RES$Brier_integer_train, probs=c(0.025, 0.975))
+
+cat(red("
+validation
+"))
+paste("AVG : ", round(mean(RES$Brier_integer_val),4))
+quantile(RES$Brier_integer_val, probs=c(0.025, 0.975))
+
+
+##############             AUC ROC            ##############
+
+cat(green("
+AUC ROC 1 mois
+"))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$AUC_ROC_1mois_train),4))
+quantile(RES$AUC_ROC_1mois_train, probs=c(0.025, 0.975))
+
+
+##############             AUC ROC            ##############
+
+cat(green("
+AUC ROC 3 mois
+"))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$AUC_ROC_3mois_train),4))
+quantile(RES$AUC_ROC_3mois_train, probs=c(0.025, 0.975))
+
+##############             AUC ROC            ##############
+
+cat(green("
+AUC ROC 6 mois
+"))
+
+cat(red("
+train
+"))
+paste("AVG : ", round(mean(RES$AUC_ROC_6mois_train),4))
+quantile(RES$AUC_ROC_6mois_train, probs=c(0.025, 0.975))
+
+```
+
+
+
+```{r}
+for(month in c(1,3,6)){
+ 
+  
+#PREDITS-------------------------------------------------------------------------------------------
+new.data <- subset(data, select = -c(N,time,status))
+surv3 <- NULL
+
+
+for(i in 1:length(new.data$Age_L3)){
+  
+  
+
+      
+      
+  X <- new.data[i,]
+  surv3 <- c(surv3,suppressWarnings(model_final(X)$table[model_final(X)$table$time==max(model_final(X)$table[model_final(X)$table$time<=month,]$time),]$pred))
+}
+
+surv3_cate <- cut(surv3, breaks=c(quantile(surv3, probs = c(0, 0.25, 0.5, 0.75, 1),na.rm = F)),include.lowest = TRUE)
+
+new.table <- data.frame(surv3,surv3_cate)
+#--------------------------------------------------------------------------------------------------
+
+
+
+new.data <- cbind(data, new.table)
+
+
+#OBSERVES------------------------------------------------------------------------------------------
+new.KM_1 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[1],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[1],]$status==1) ~ 1,
+                    type = "kaplan-meier",
+                    error = "greenwood")
+new.KM_2 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[2],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[2],]$status==1) ~ 1,
+                    type = "kaplan-meier",
+                    error = "greenwood")
+new.KM_3 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[3],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[3],]$status==1) ~ 1,
+                    type = "kaplan-meier",
+                    error = "greenwood")
+new.KM_4 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[4],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[4],]$status==1) ~ 1,
+                    type = "kaplan-meier",
+                    error = "greenwood")
+
+#--------------------------------------------------------------------------------------------------
+
+#predit
+x = sapply(split(new.table$surv3, new.table$surv3_cate), mean)
+#observe
+y = c(summary(new.KM_1, time = month)$surv,
+      summary(new.KM_2, time = month)$surv,
+      summary(new.KM_3, time = month)$surv,
+      summary(new.KM_4, time = month)$surv)
+
+up <- c(summary(new.KM_1, time = month)$upper,
+        summary(new.KM_2, time = month)$upper,
+        summary(new.KM_3, time = month)$upper,
+        summary(new.KM_4, time = month)$upper)
+
+down <- c(summary(new.KM_1, time = month)$lower,
+          summary(new.KM_2, time = month)$lower,
+          summary(new.KM_3, time = month)$lower,
+          summary(new.KM_4, time = month)$lower)
+
+graph <- ggplot(data = data.frame(x,y)) +
+  aes(x, y) +
+  labs(x = "Predicted",
+       y = "Observed") +
+  geom_point(color = "blue", size =2) +
+  xlim(c(0,1)) +
+  ylim(c(0,1)) +
+  geom_errorbar(aes(ymin=down, ymax=up), width=.01,
+                 position=position_dodge(0.05)) +
+  
+  geom_abline(intercept = 0,
+              slope = 1)+
+  theme_light() +
+  theme(axis.text.x = element_text(size=14),
+        axis.text.y = element_text(size=14),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14))
+
+print(graph)
+
+}
+```
+
+```{r}
+#esperance de vie
+KM <- survfit(Surv(data$time,
+                   data$status==1) ~ 1,
+              type = "kaplan-meier",
+              error = "greenwood")
+
+EV <- rmst(times = summary(KM)$time, 
+           surv.rates = summary(KM)$surv, 
+           max.time = max(KM$time),#mois
+           type = "s")
+
+#PREDITS-------------------------------------------------------------------------------------------
+new.data <- subset(data, select = -c(N,time,status))
+surv3 <- NULL
+for(i in 1:length(new.data$Age_L3)){
+  X <- new.data[i,]
+  surv3 <- c(surv3,model_final(X)$table[model_final(X)$table$time==max(model_final(X)$table[model_final(X)$table$time<=EV,]$time),]$pred)
+}
+
+surv3_cate <- cut(surv3, breaks=c(quantile(surv3, probs = c(0, 0.25, 0.5, 0.75, 1),na.rm = F)),include.lowest = TRUE)
+
+new.table <- data.frame(surv3,surv3_cate)
+#--------------------------------------------------------------------------------------------------
+
+
+new.data <- cbind(data, new.table)
+
+
+plot(survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[4],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[4],]$status==1) ~ 1,
+                    type = "kaplan-meier"),conf.int = FALSE, col = "navy")
+lines(survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[2],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[2],]$status==1) ~ 1,
+                    type = "kaplan-meier"),conf.int = FALSE, col = "forestgreen")
+lines(survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[3],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[3],]$status==1) ~ 1,
+                    type = "kaplan-meier"),conf.int = FALSE, col = "red")
+lines(survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[1],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[1],]$status==1) ~ 1,
+                    type = "kaplan-meier"),conf.int = FALSE, col = "black")
+
+
+
+
+```
+
+
+
+```{r}
+tmp <- NULL
+for(i in 1:length(new.data$Age_L3)){
+  X <- new.data[i,]
+  tmp <- c(tmp,suppressWarnings(model_final(X)$table$pred))
+}
+
+
+MST <- NULL
+for(patient in 1:202){
+  MST <- c(MST, rmst(times = unique(data$time),
+                     surv.rates = matrix(tmp,ncol=202)[,patient],
+                     max.time = max(unique(data$time)),
+                     type = "s"))
+}
+```
+
+
+
+```{r}
+grp <- cut(MST, breaks=c(quantile(MST, probs = c(0, 0.25, 0.5, 0.75, 1),na.rm = F)),include.lowest = TRUE)
+
+tmp_data <- cbind(data.frame(MST,grp), data)
+
+new.data <- new.data[-192,]
+surv_4 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[4],]$time,
+                         new.data[c(new.data$surv3_cate==levels(surv3_cate)[4]),]$status==1) ~ 1,
+                    type = "kaplan-meier")
+surv_3 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[3],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[3],]$status==1) ~ 1,
+                    type = "kaplan-meier")
+surv_2 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[2],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[2],]$status==1) ~ 1,
+                    type = "kaplan-meier")
+surv_1 <- survfit(Surv(new.data[new.data$surv3_cate==levels(surv3_cate)[1],]$time,
+                         new.data[new.data$surv3_cate==levels(surv3_cate)[1],]$status==1) ~ 1,
+                    type = "kaplan-meier")
+
+
+sur_grp1 <- apply(matrix(tmp,ncol=202)[,which(data.frame(MST,grp)$grp==levels(grp)[1])],MARGIN = 1,FUN = mean)
+sur_grp2 <- apply(matrix(tmp,ncol=202)[,which(data.frame(MST,grp)$grp==levels(grp)[2])],MARGIN = 1,FUN = mean)
+sur_grp3 <- apply(matrix(tmp,ncol=202)[,which(data.frame(MST,grp)$grp==levels(grp)[3])],MARGIN = 1,FUN = mean)
+sur_grp4 <- apply(matrix(tmp,ncol=202)[,which(data.frame(MST,grp)$grp==levels(grp)[4])],MARGIN = 1,FUN = mean)
+
+```
+
+```{r}
+
+
+plot(x = c(0,unique(sort(data$time)))[-114], y = sur_grp4[-114], type = "step", ylab = "Progression-free survival", xlab = "Time from the third line treatment (month)",lty = "dotted", xlim =  c(0,23), ylim = c(0,1))
+
+lines(surv_4, conf.int = FALSE)
+
+#axis(1,
+#     at = seq(2, 50, by = 2),
+#     tck = 1, lty = 1, col = "gray90")
+#
+#axis(2,
+#     at = seq(.125, 1, by = .125),
+#     tck = 1, lty = 1, col = "gray90")
+
+x = c(0,unique(sort(data[data$time <= max(summary(surv_3)$time),]$time)))
+plot(x = x, y = sur_grp3[1:length(x)], type = "step",lty = "dotted", xlab = "Time from the third line treatment (month)", ylab = "Progression-free survival", xlim =  c(0,23), ylim = c(0,1))
+
+lines(surv_3,conf.int = FALSE)
+
+x = c(0,unique(sort(data[data$time <= max(summary(surv_2)$time),]$time)))
+plot(x = x, y = sur_grp2[1:length(x)], type = "step",lty = "dotted", xlab = "Time from the third line treatment (month)", ylab = "Progression-free survival", xlim =  c(0,23), ylim = c(0,1))
+
+lines(surv_2,conf.int = FALSE)
+
+x = c(0,unique(sort(data[data$time <= max(summary(surv_1)$time),]$time)))
+plot(x = x, y = sur_grp1[1:length(x)], type = "step",lty = "dotted", xlab = "Time from the third line treatment (month)", ylab = "Progression-free survival", xlim =  c(0,23), ylim = c(0,1))
+
+lines(surv_1,conf.int = FALSE)
+
+```
+
+
+
+#ROC
+
+```{r}
+surv_global <- NULL
+for(i in 1:length(new.data$Age_L3)){
+  X <- new.data[i,]
+  surv_global <- c(surv_global,model_final(X)$table$pred)
+}
+
+```
+
+
+
+```{r}
+surv_cate <- cut(model_final(X)$table$pred, breaks=c(quantile(model_final(X)$table$pred, probs = c(0, 0.25, 0.5, 0.75, 1),na.rm = F)),include.lowest = TRUE)
+sapply(split(model_final(X)$table$pred, surv_cate), mean)
+```
+
+```{r}
+table_resultats <- cbind(table_resultats,summary(coxph(Surv(time, status)~.-N, data = data))$conf.int[,-2])
+table_resultats$HR_LASSO <- round(exp(table_resultats$AVG),3)
+table_resultats <- cbind(table_resultats,t(round(sapply(exp(table_LASSO), quantile, probs = c(0.25,0.75)),4)))
+#write.xlsx(table_resultats ,file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_resultats2.xlsx")
+```
+
+

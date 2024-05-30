@@ -1,0 +1,33 @@
+
+#test de log-linearite (variables quantitatives)
+plot_log_linear <- function(data, var, var_cate){
+  
+  tmp <- summary(coxph(Surv(data$time, data$status==1) ~ data[[var]], data=data))$conf.int
+  
+  cat(green(var))
+  print(tmp)
+  
+  tmp_cate <- summary(coxph(Surv(data$time, data$status==1) ~ data[[var_cate]], data=data))$conf.int
+  
+  cat(green(var_cate))
+  print(tmp_cate)
+  
+  exp_beta <- c(1, tmp_cate[1,1], tmp_cate[2,1])
+  
+  plot(x = sort(unique(data[[var_cate]])), y = log(exp_beta), xlab = var_cate, ylab = expression(log(exp_beta)), border = "white", main = var_cate)
+  points(log(exp_beta),pch=16, col = "blue")
+}
+
+
+data$Age_L3_cate <- cut(data$Age_L3, breaks = 3)
+#data$Age_L3_cate <- cut(data$Age_L3, breaks = quantile(data$Age_L3, c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE), include.lowest = TRUE)
+data$SSP1_cate <- cut(log(data$SSP1), breaks = quantile(log(data$SSP1), c(0, 1/3,2/3, 1), na.rm = TRUE), include.lowest = TRUE)
+data$SSP2_cate <- cut(log(data$SSP2), breaks=quantile(log(data$SSP2), c(0, 1/3,2/3, 1), na.rm = TRUE), include.lowest = TRUE)
+
+par(mfrow = c(2,2))
+
+plot_log_linear(data, "Age_L3", "Age_L3_cate")
+plot_log_linear(data, "SSP1", "SSP1_cate")
+plot_log_linear(data, "SSP2", "SSP2_cate")
+
+

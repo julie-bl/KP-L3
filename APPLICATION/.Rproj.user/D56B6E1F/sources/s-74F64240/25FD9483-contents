@@ -1,0 +1,723 @@
+---
+title: "Pancreas"
+author: "Antoine Pelras"
+date: "26/09/2023"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+**Librairies**
+```{r}
+library(readxl)
+library(survival)
+library(survminer)
+library(flextable)
+library(glmnet)
+library(mice)
+library(scoring)
+library(ggplot2)
+library(dplyr)
+library(gtsummary)
+library(lubridate)
+library(progress)
+library(stringr)
+library(crayon)
+library(survivalSL)
+library(RISCA)
+library(openxlsx)
+library(DescTools)
+```
+
+**Import**
+```{r}
+data <- data.frame(read_excel("J:/4-Méthodologiste/Antoine/PANCREAS/table_pancreas_L3.xlsx"))
+```
+
+**regroupement de certaines valeurs**
+```{r}
+data[data$Nbre.de.site.metastatique_dg>=1,"Nbre.de.site.metastatique_dg"] <- "1etplus"
+
+data[data$Delai.entre.diag.et.non.resecable..en.mois.!=0,"Delai.entre.diag.et.non.resecable..en.mois."] <- "Oui"
+data[data$Delai.entre.diag.et.non.resecable..en.mois.==0,"Delai.entre.diag.et.non.resecable..en.mois."] <- "Non"
+names(data)[11] <- "Delai.entre.diag.et.non.resecable"
+
+
+data[data$Carcinose_L3=="isolée" | data$Carcinose_L3=="avec autres","Carcinose_L3"] <- "oui"
+```
+
+**Gestion NA**
+```{r}
+data <- as.data.frame(sapply(data, gsub, pattern ="DM", replacement = NA))
+```
+
+**Type des variables**
+```{r}
+data$Sexe <- as.factor(data$Sexe)
+data$Resection.primitif <- as.factor(data$Resection.primitif)
+data$Protocole_L1groupebis <- as.factor(data$Protocole_L1groupebis)
+data$Censure.SSP1 <- as.factor(data$Censure.SSP1)
+data$Censure.SSP2 <- as.factor(data$Censure.SSP2)
+data$Censure.SG <- as.factor(data$Censure.SG)
+data$Epuisement.therap <- as.factor(data$Epuisement.therap)
+data$OMS_L3.regroupe <- as.factor(data$OMS_L3.regroupe)
+data$Delai.entre.diag.et.non.resecable <- as.factor(data$Delai.entre.diag.et.non.resecable)
+data$Carcinose_L3 <- as.factor(data$Carcinose_L3)
+data$Meta.hep_L3 <- as.factor(data$Meta.hep_L3)
+data$Meta.pulm_L3 <- as.factor(data$Meta.pulm_L3)
+data$Nbre.de.site.metastatique_dg <- as.factor(data$Nbre.de.site.metastatique_dg)
+data$OMSregroupe_dg <- as.factor(data$OMSregroupe_dg)
+
+data$N <- as.numeric(data$N)
+data$SSP1 <- as.numeric(data$SSP1)
+data$SSP2 <- as.numeric(data$SSP2)
+data$SG...debut.L3 <- as.numeric(data$SG...debut.L3)
+data$Age_L3 <- as.numeric(data$Age_L3)
+```
+
+**Selection des variables**
+```{r}
+var <- c("N",
+         "Nbre.de.site.metastatique_dg",
+         "SSP1",
+         "SSP2",
+         "Age_L3",
+         "Sexe",
+         "Resection.primitif",
+         "Protocole_L1groupebis",
+         "Epuisement.therap",
+         "OMS_L3.regroupe",
+         "Carcinose_L3",
+         "Meta.hep_L3",
+         "Meta.pulm_L3",
+         "SG...debut.L3",
+         "Censure.SG")
+data <- data[,var]
+```
+
+
+```{r}
+#######################################################################################
+###                                 Disjonctif                                      ###
+#######################################################################################
+
+#without : variable ou il ne faut pas faire de disjonctif 
+categorial <- function(data, without){
+  
+  name <- colnames(data[,-which(colnames(data) %in% without)])
+  nb <- length(name)
+  var<- NULL
+  for (col in 1:nb) {
+    i <- name[col]
+    if (is.factor(data[,i])){
+      if (length(levels(data[,i]))>2){
+        if (substr(levels(data[,i])[1], 1, 6) == substr(levels(data[,i])[2], 1, 6)) {
+          for (j in 1:length(levels(data[,i]))) {
+            data$a <- as.factor(ifelse(data[,i] == sort(levels(data[,i]))[j], 1, 0))
+            colnames(data)[ncol(data)] <- str_replace(paste0(i,"_",substr(sort(levels(data[,i]))[j],1,9))," ","")
+            var <- c(var, i)
+          }
+        }else {
+          for (j in 2:length(levels(data[,i]))) {
+            data$a <- as.factor(ifelse(data[,i] == sort(levels(data[,i]))[j], 1, 0))
+            colnames(data)[ncol(data)] <- str_replace(paste0(i,"_",substr(sort(levels(data[,i]))[j],1,6))," ","")
+            var <- c(var, i)
+          }
+        }
+      } 
+    }
+  }
+  data <- data[,-which(colnames(data) %in% var)]
+  return(data)
+}
+
+#######################################################################################
+
+#######################################################################################
+
+num_name <- names(data[,unlist(lapply(data, is.numeric), use.names = FALSE) ]) # nom des variables numeriques
+
+data <- categorial(data, c(num_name))
+
+data$Sexe <- as.integer(as.numeric(data$Sexe)-1)
+data$Resection.primitif <- as.integer(as.numeric(data$Resection.primitif)-1)
+data$Protocole_L1groupebis <- as.integer(as.numeric(data$Protocole_L1groupebis)-1)
+data$Epuisement.therap <- as.integer(as.numeric(data$Epuisement.therap)-1)
+data$OMS_L3.regroupe <- as.integer(as.numeric(data$OMS_L3.regroupe)-1)
+data$Meta.pulm_L3 <- as.integer(as.numeric(data$Meta.pulm_L3)-1)
+data$Censure.SG <- as.integer(as.numeric(data$Censure.SG)-1)
+
+
+fac_name <- names(data[,unlist(lapply(data, is.factor), use.names = FALSE) ])
+data[,fac_name] <- lapply(data[,fac_name], as.numeric)
+data[,fac_name] <- data[,fac_name]-1
+data[,fac_name] <- lapply(data[,fac_name], as.integer)
+
+rm(num_name)
+
+```
+
+**Survie**
+```{r}
+#Definition des variables TEMPS et STATUS
+data$time <- data$SG...debut.L3
+data$status <- data$Censure.SG
+
+data <- select(data, -c(SG...debut.L3,Censure.SG))
+```
+
+
+# VERIFICATION HYPOTHESES AVANT MODELISATION
+
+*log-linearite*
+```{r}
+par(mfrow = c(2,2))
+cat(green("Age_L3"))
+data <- data[order(data$Age_L3),]
+
+cox1 <- coxph(Surv(time, status)~Age_L3, data = data)
+cat(red("
+summary cox1
+        "))
+summary(cox1)
+cat(red("AIC cox1
+        "))
+AIC(cox1)
+plot(data$Age_L3, predict(cox1, type = "lp"), type="l", col="blue",
+     xlab="Age en années", ylab="Prédicteur linéaire")
+
+cox2 <- coxph(Surv(time, status)~bs(Age_L3, df=3), data = data)
+cat(red("summary cox2
+        "))
+summary(cox2)
+cat(red("AIC cox2
+        "))
+AIC(cox2)
+lines(data$Age_L3, predict(cox2, type = "lp"), type="l", col="red")
+
+
+
+
+
+data <- data[order(data$SSP1),]
+cat(green("log_SSP1"))
+cox1 <- coxph(Surv(time, status)~log(SSP1), data = data)
+cat(red("
+summary cox1
+        "))
+summary(cox1)
+cat(red("AIC cox1
+        "))
+AIC(cox1)
+plot(log(data$SSP1), predict(cox1, type = "lp"), type="l", col="blue",
+     xlab="log(SSP1) en mois", ylab="Prédicteur linéaire")
+
+cox2 <- coxph(Surv(time, status)~bs(log(SSP1), df=3), data = data)
+cat(red("summary cox2
+        "))
+summary(cox2)
+cat(red("AIC cox2
+        "))
+AIC(cox2)
+lines(log(data$SSP1), predict(cox2, type = "lp"), type="l", col="red")
+
+
+
+
+data.na <- data[!is.na(data$SSP2),]
+data.na <- data.na[order(data.na$SSP2),]
+
+data.na$temp <- log(data.na$SSP2)
+
+cat(green("log_SSP2"))
+cox1 <- coxph(Surv(time, status)~temp, data = data.na)
+cat(red("
+summary cox1
+        "))
+summary(cox1)
+cat(red("AIC cox1
+        "))
+AIC(cox1)
+plot(data.na$temp, predict(cox1, type = "lp"), type="l", col="blue",
+     xlab="log(SSP2) en mois", ylab="Prédicteur linéaire")
+
+cox2 <- coxph(Surv(time, status)~bs(temp, df=3), data = data.na)
+cat(red("summary cox2
+        "))
+summary(cox2)
+cat(red("AIC cox2
+        "))
+AIC(cox2)
+lines(data.na$temp, predict(cox2, type = "lp"), type="l", col="red")
+
+rm(data.na)
+```
+
+**Transformation de SSP2 en log(SSP2) idem pour SSP1**
+```{r}
+data$log_SSP1 <- log(data$SSP1)
+data$log_SSP2 <- log(data$SSP2)
+data <- select(data, -c(SSP1,SSP2))
+data <- data[order(data$N),]
+
+covariables <- names(select(data,-c("N","time","status")))
+```
+
+
+*proportionnalite des riques*
+```{r}
+for(var in covariables){
+  cat(green(var))
+  print(cox.zph(coxph(Surv(data$time, data$status==1) ~ data[[var]], data=data)))
+  plot(cox.zph(coxph(Surv(data$time, data$status==1) ~ data[[var]], data=data)), main = var)
+}
+```
+
+# Analyse Univariee
+
+```{r}
+HR <- function(data, var_selec){
+  
+  tmp <- NULL
+  
+  for(var in var_selec){
+    tmp <- c(tmp,summary(coxph(Surv(data$time, data$status==1) ~ data[[var]], data=data))$conf.int[1])
+  }
+  
+  return(tmp)
+}
+```
+
+# MODELE
+
+**LASSO**
+```{r}
+# x : data.frame des covariables
+# y : Surv(time, status)
+
+LASSO <- function(x,y){
+
+  #Cross-Validation 20 partitions, alpha = 1 = LASSO
+  lasso <- suppressWarnings(cv.glmnet(x, y, alpha = 1, family = "cox", type.measure = "deviance", nfolds = 20))
+  
+  #Parametre de penalisation lambda, minimisation de l’erreur de CV
+  lambda_min <- lasso$lambda.min
+  
+  lasso1 <- glmnet(x, y, alpha = 1, family = "cox", lambda = lambda_min)
+ 
+  lasso1
+
+}
+```
+
+*Estimation non parametrique de la fonction de risque de base*
+
+**Breslow**
+```{r}
+#times = vecteur des temps d evenement
+#failures = vecteur du status de l evenement
+#lp = linear prediction : predict(model, X)
+
+Breslow <- function(times, failures, lp){
+
+  tmp <- data.frame(times, failures)[order(times),]
+  ut <- unique(tmp$times)
+  
+  h <- sapply(X = ut, FUN = function(x) (sum(tmp[tmp$times==x,]$failures))/sum(exp(lp[times >= x])))
+  
+  return(cumsum(h))
+}
+```
+
+# IMPUTATION MULTIVARIEE
+
+**MICE**
+```{r}
+str(data)
+
+nb_BDD_completes = 5
+
+m <- mice(data, maxit=0)
+p <- m$predictorMatrix
+#ON N IMPUTE PAS LES CRITERES DE JUGEMENT !
+#mettre a 0 certaines variables (variables a expliquer)
+p[,c("N","time", "status")]=0
+MICE <- mice(data, m = nb_BDD_completes, maxit = 20, predictorMatrix = p, method = m$method)
+
+##voir le nombre de Na
+#sapply(data, function(x) (sum(is.na(x)))) *100/nrow(data)
+#sapply(complete(MICE, 1), function(x) (sum(is.na(x)))) *100/nrow(complete(MICE, 1))
+
+rm(p)
+rm(m)
+
+#save(MICE, file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/MICE.RData")
+```
+
+```{r}
+#load("MICE.RData")
+```
+
+
+
+# BOOTSTRAP
+
+**Algo**
+```{r}
+
+TIME <- data.frame(time = sort(unique(data$time)))
+H0B <- data.frame(time = sort(unique(data$time)))
+
+nb_ech_bootstrap = 1000
+  
+  # INITIALISATION
+  
+  vec_rmst <- NULL
+
+  AU <- NULL
+  
+  SOMME <- 0
+  
+  Brier_1mois_train <- NULL
+  Brier_1mois_val <- NULL
+  Brier_3mois_train <- NULL
+  Brier_3mois_val <- NULL
+  Brier_6mois_train <- NULL
+  Brier_6mois_val <- NULL
+
+  Brier_integer_train <- NULL
+  Brier_integer_val <- NULL
+  
+  AUC_ROC_1mois_train <- NULL
+  AUC_ROC_3mois_train <- NULL
+  AUC_ROC_6mois_train <- NULL
+  AUC_ROC_train <- NULL
+  
+  AUC_ROC_1mois_val <- NULL
+  AUC_ROC_3mois_val <- NULL
+  AUC_ROC_6mois_val <- NULL
+  AUC_ROC_val <- NULL
+  
+  res_LASSO <- matrix(ncol = nb_ech_bootstrap, nrow = length(covariables)) 
+  res_LASSO <- data.frame(res_LASSO)
+  
+#===============================PROGRESSBAR========================================================
+
+pb <- progress_bar$new(format = "(:spin) [:bar] :percent [Elapsed time: :elapsedfull || Estimated time remaining: :eta]",
+                       total = nb_ech_bootstrap,
+                       complete = "=",   # Completion bar character
+                       incomplete = "-", # Incomplete bar character
+                       current = ">",    # Current bar character
+                       clear = FALSE,    # If TRUE, clears the bar when finish
+                       width = 100)      # Width of the progress bar
+
+  
+  for(j in 1:nb_BDD_completes){
+    
+    # Updates the current state
+      pb$tick()
+    
+      #--------------------------------------------
+      # Code to be executed
+      #--------------------------------------------
+    
+    data_tmp = complete(MICE, j)
+    
+    for(i in (1+nb_ech_bootstrap*(j-1)):(nb_ech_bootstrap*j)) {
+
+  
+    ###############################################################################################
+    ##                                            TIRAGE                                         ##
+    ###############################################################################################
+    
+    train <- data_tmp[sample(1:nrow(data_tmp), nrow(data_tmp), replace = TRUE),]
+    val <- data_tmp[-unique(train$N),]
+    
+    
+    
+    
+    ###############################################################################################
+    ##                                          DESCRIPTION                                      ##
+    ###############################################################################################
+    
+    
+    
+    #Aire sous la courbe de survie + IC
+    
+    KM_train <- survfit(Surv(train$time,train$status==1) ~ 1,  type = "kaplan-meier",  error = "greenwood")
+    
+    vec_rmst <- c(vec_rmst, rmst(times = summary(KM_train)$time, 
+                                 surv.rates = summary(KM_train)$surv, 
+                                 max.time = max(KM_train$time),#mois
+                                 type = "s"))
+    
+    
+    
+    ###############################################################################################
+    ##                                     ANALYSES UNIVARIEES                                   ##
+    ###############################################################################################  
+  
+    
+    AU <- c(AU,HR(train, covariables))
+    
+    
+    
+    ###############################################################################################
+    ##                                           LASSO                                           ##
+    ###############################################################################################
+    
+    X <- as.matrix(select(train,-c(N,time,status)))
+    Y <- Surv(train$time, train$status)
+    tmp_LASSO <- LASSO(x = X, y = Y)
+    res_LASSO[,i] <- suppressWarnings(tmp_LASSO$beta[1:length(covariables)])
+    
+    lp.lasso <- predict(tmp_LASSO, X)
+    
+    b <- Breslow(times = train$time, failures = train$status, lp = lp.lasso)
+    
+    H0 <- data.frame(value = b, time = unique(sort(train$time)))
+    H0 <- data.frame(time = TIME$time,value = LOCF(left_join(TIME,H0,by ="time")$value))
+    
+    
+    
+    H0B <- cbind(H0B,H0$value)
+    
+    pred.temp <- exp(matrix(exp(lp.lasso))%*%t(as.matrix(-1*H0$value)))
+    pred.temp[is.na(pred.temp)] <- 1
+    
+    SOMME <- SOMME + pred.temp
+    
+    ###############################################################################################
+    ##                                         METRIQUES                                         ##
+    ###############################################################################################
+    
+    
+    #--------------------------------------------Train---------------------------------------------
+    
+    Brier_1mois_train <- c(Brier_1mois_train, metrics(times = "time",
+                                                     failures = "status",
+                                                     data = train,
+                                                     prediction.matrix = pred.temp,
+                                                     prediction.times = sort(unique(train$time)),
+                                                     metric = "bs",
+                                                     pro.time = 1))
+    
+    Brier_3mois_train <- c(Brier_3mois_train, metrics(times = "time",
+                                                     failures = "status",
+                                                     data = train,
+                                                     prediction.matrix = pred.temp,
+                                                     prediction.times = sort(unique(train$time)),
+                                                     metric = "bs",
+                                                     pro.time = 3))
+    
+    Brier_6mois_train <- c(Brier_6mois_train, metrics(times = "time",
+                                                     failures = "status",
+                                                     data = train,
+                                                     prediction.matrix = pred.temp,
+                                                     prediction.times = sort(unique(train$time)),
+                                                     metric = "bs",
+                                                     pro.time = 6))
+    
+    Brier_integer_train <- c(Brier_integer_train, metrics(times = "time",
+                                                          failures = "status",
+                                                          data = train,
+                                                          prediction.matrix = pred.temp,
+                                                          prediction.times = sort(unique(train$time)),
+                                                          metric = "ibs"))
+                              
+    AUC_ROC_1mois_train <- c(AUC_ROC_1mois_train, metrics(times = "time",
+                                                   failures = "status",
+                                                   data = train,
+                                                   prediction.matrix = pred.temp,
+                                                   prediction.times = sort(unique(train$time)),
+                                                   metric = "auc",
+                                                   pro.time = 1))
+    
+    AUC_ROC_3mois_train <- c(AUC_ROC_3mois_train, metrics(times = "time",
+                                                   failures = "status",
+                                                   data = train,
+                                                   prediction.matrix = pred.temp,
+                                                   prediction.times = sort(unique(train$time)),
+                                                   metric = "auc",
+                                                   pro.time = 3))
+    
+    AUC_ROC_6mois_train <- c(AUC_ROC_6mois_train, metrics(times = "time",
+                                                   failures = "status",
+                                                   data = train,
+                                                   prediction.matrix = pred.temp,
+                                                   prediction.times = sort(unique(train$time)),
+                                                   metric = "auc",
+                                                   pro.time = 6))
+
+    
+      
+# #-------------------------------------------Validation-----------------------------------------
+# 
+# X <- as.matrix(select(val,-c(N,time,status)))
+# 
+# lp.val.lasso <- predict(tmp_LASSO, X)
+# 
+# pred.val.temp <- exp(matrix(exp(lp.val.lasso))%*%t(as.matrix(-1*H0$value)))
+# 
+# 
+# Brier_1mois_val <- c(Brier_1mois_val, metrics(times = "time",
+#                                              failures = "status",
+#                                              data = val,
+#                                              prediction.matrix = pred.val.temp,
+#                                              prediction.times = sort(unique(train$time)),
+#                                              metrics = "bs",
+#                                              pro.time = 1))
+# 
+# Brier_3mois_val <- c(Brier_3mois_val, metrics(times = "time",
+#                                              failures = "status",
+#                                              data = val,
+#                                              prediction.matrix = pred.val.temp,
+#                                              prediction.times = sort(unique(train$time)),
+#                                              metrics = "bs",
+#                                              pro.time = 3))
+# 
+# Brier_6mois_val <- c(Brier_6mois_val, metrics(times = "time",
+#                                              failures = "status",
+#                                              data = val,
+#                                              prediction.matrix = pred.val.temp,
+#                                              prediction.times = sort(unique(train$time)),
+#                                              metrics = "bs",
+#                                              pro.time = 6))
+# 
+# Brier_integer_val <- c(Brier_integer_val, metrics(times = "time",
+#                                                  failures = "status",
+#                                                  data = val,
+#                                                  prediction.matrix = pred.val.temp,
+#                                                  prediction.times = sort(unique(train$time)),
+#                                                  metrics = "ibs"))
+# 
+# AUC_ROC_1mois_val <- c(AUC_ROC_1mois_val, metrics(times = "time",
+#                                                failures = "status",
+#                                                data = val,
+#                                                prediction.matrix = pred.temp,
+#                                                prediction.times = sort(unique(train$time)),
+#                                                metrics = "auc",
+#                                                pro.time = 1))
+# 
+# AUC_ROC_3mois_val <- c(AUC_ROC_3mois_val, metrics(times = "time",
+#                                      failures = "status",
+#                                      data = val,
+#                                      prediction.matrix = pred.val.temp,
+#                                      prediction.times = sort(unique(train$time)),
+#                                      metrics = "auc",
+#                                      pro.time = 3))
+# 
+# AUC_ROC_6mois_val <- c(AUC_ROC_6mois_val, metrics(times = "time",
+#                                                failures = "status",
+#                                                data = val,
+#                                                prediction.matrix = pred.temp,
+#                                                prediction.times = sort(unique(train$time)),
+#                                                metrics = "auc",
+#                                                pro.time = 6))
+
+    ###############################################################################################
+    ##                                      Cox sans LASSO                                       ##
+    ##                                        MULTIVARIE                                         ##
+    ###############################################################################################
+    
+    
+    }
+  }
+      
+RES <- list(AU = AU,
+            RMST = vec_rmst,
+            res_LASSO = res_LASSO,
+            model = SOMME/(nb_ech_bootstrap*nb_BDD_completes),
+            H0B = H0B,
+            Brier_1mois_train = Brier_1mois_train,
+            Brier_3mois_train = Brier_3mois_train,
+            Brier_6mois_train = Brier_6mois_train,
+            Brier_integer_train = Brier_integer_train,
+            AUC_ROC_1mois_train = AUC_ROC_1mois_train,
+            AUC_ROC_3mois_train = AUC_ROC_3mois_train,
+            AUC_ROC_6mois_train = AUC_ROC_6mois_train,
+            AUC_ROC_train = AUC_ROC_train,
+            Brier_3mois_val = Brier_3mois_val,
+            Brier_integer_val = Brier_integer_val,
+            AUC_ROC_val = AUC_ROC_val)
+
+#==================================================================================================
+
+rm(pb)
+#save(RES_global, file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/RES.RData")
+
+```
+
+
+```{r}
+plot(survfit(Surv(time, status) ~ 1, data = data),col = "blue", conf.int = FALSE)
+lines(y=sapply(X = data.frame(SOMME/(nb_ech_bootstrap*nb_BDD_completes)) , FUN  = mean), type = "step", x = sort(unique(data$time)), col = "red")
+```
+
+
+
+
+```{r}
+table_LASSO <- data.frame(rbind(t(RES$res_LASSO)))
+
+colnames(table_LASSO) <- covariables
+rownames(table_LASSO) <- 1:(nb_ech_bootstrap*nb_BDD_completes)
+
+#moyennes des coefficients de regression
+table_resultats <- data.frame(AVG = apply(table_LASSO, FUN = mean, MARGIN = 2, na.rm = TRUE)) 
+#IC des coefficents de regression
+#table_resultats <- rbind(t(table_resultats), Borne_inf = apply(table_LASSO, FUN = quantile, probs=c(.025, .975), #MARGIN = 2, na.rm = TRUE))
+
+
+pourcentage_non_null <- function(table){
+  tmp <- c()
+  for(num_colonne in 1:length(covariables)){
+    tmp <- c(tmp, 100*(1-(sum(table[1:nb_ech_bootstrap,num_colonne]==0)/nb_ech_bootstrap)))
+  }
+  tmp
+}
+
+#ajout pourcentage (presence) pour chaque variable (selection lasso)
+table_resultats <- cbind(table_resultats, non_nul = pourcentage_non_null(table_LASSO))
+
+#write.xlsx(table_resultats ,file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_resultats.xlsx",rowNames = TRUE)
+
+#write.csv(table_resultats ,file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_resultats.csv")
+
+#write.xlsx(table_LASSO ,file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_LASSO.xlsx",rowNames = TRUE)
+```
+
+**Analyse Univariee**
+```{r}
+tmp <- data.frame(matrix(RES$AU, ncol= length(covariables), byrow = TRUE))
+names(tmp) <- covariables
+tmp <- rbind(tmp, apply(t(tmp), FUN = quantile, probs=c(.025, .975), MARGIN = 1, na.rm = TRUE))
+tmp
+
+
+table_rapport_risque <- data.frame(HR(data, covariables))
+rownames(table_rapport_risque ) <- covariables
+colnames(table_rapport_risque ) <- "HR"
+
+
+table_rapport_risque <- cbind(table_rapport_risque,t(tmp["2.5%",]))
+table_rapport_risque <- cbind(table_rapport_risque,t(tmp["97.5%",]))
+
+table_rapport_risque 
+
+rm(tmp)
+
+#summary(coxph(Surv(data$time, data$status==1) ~ Age_L3, data=data))$conf.int
+
+
+#library(openxlsx)
+#write.xlsx(table_rapport_risque ,file = "J:/4-Méthodologiste/Antoine/pancreas/Resultats/table_rapport_risque .xlsx",rowNames = TRUE)
+
+
+```
+
+```{r}
+#write.xlsx(data ,file = "J:/4-Méthodologiste/Antoine/pancreas/data.xlsx")
+```
+

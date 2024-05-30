@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1713866543948.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "505A81F5",
+    "lastKnownWriteTime" : 1716559317,
+    "last_content_update" : 1716559317,
+    "path" : "J:/4-Méthodologiste/Antoine/GITHUB/KP-L3/APPLICATION/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "196,4",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

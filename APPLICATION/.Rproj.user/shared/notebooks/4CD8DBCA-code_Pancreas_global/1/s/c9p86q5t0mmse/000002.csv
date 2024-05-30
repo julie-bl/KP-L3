@@ -1,0 +1,8 @@
+"0","data[data$Nbre.de.site.metastatique_dg>=1,""Nbre.de.site.metastatique_dg""] <- ""1etplus"""
+"0",""
+"0","data[data$Delai.entre.diag.et.non.resecable..en.mois.!=0,""Delai.entre.diag.et.non.resecable..en.mois.""] <- ""Oui"""
+"0","data[data$Delai.entre.diag.et.non.resecable..en.mois.==0,""Delai.entre.diag.et.non.resecable..en.mois.""] <- ""Non"""
+"0","names(data)[11] <- ""Delai.entre.diag.et.non.resecable"""
+"0",""
+"0",""
+"0","data[data$Carcinose_L3==""isolée"" | data$Carcinose_L3==""avec autres"",""Carcinose_L3""] <- ""oui"""

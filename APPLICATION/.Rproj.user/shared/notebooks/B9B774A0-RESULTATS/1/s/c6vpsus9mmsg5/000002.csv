@@ -1,0 +1,2 @@
+"0","HR_tmp <- data.frame(matrix(RES$AU,ncol = 13, byrow = TRUE))"
+"0","HR_moy <- sapply(HR_tmp, mean)"

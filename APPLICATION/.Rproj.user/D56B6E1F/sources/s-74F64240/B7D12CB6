@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1713866889381.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B7D12CB6",
+    "lastKnownWriteTime" : 1716558127,
+    "last_content_update" : 1716821749015,
+    "path" : "J:/4-Méthodologiste/Antoine/PANCREAS/Resultats/RESULTATS.Rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "18,89",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

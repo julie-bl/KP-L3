@@ -1,0 +1,6 @@
+"0","load(""MICE.RData"")
+"
+"2","impossible d'ouvrir le fichier compressé 'MICE.RData', cause probable : 'No such file or directory'"
+"2","Erreur dans readChar(con, 5L, useBytes = TRUE) : 
+  impossible d'ouvrir la connexion
+"

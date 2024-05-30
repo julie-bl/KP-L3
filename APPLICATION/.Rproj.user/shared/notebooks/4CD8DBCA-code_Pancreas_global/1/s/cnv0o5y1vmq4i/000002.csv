@@ -1,0 +1,1 @@
+"0","data <- as.data.frame(sapply(data, gsub, pattern =""DM"", replacement = NA))"

@@ -1,0 +1,5 @@
+"0","HR(train, covariables)
+"
+"2","Erreur dans h(simpleError(msg, call)) : 
+  erreur d'ï¿½valuation de l'argument 'object' lors de la sï¿½lection d'une mï¿½thode pour la fonction 'summary' : type (NULL) incorrect pour la variable 'data[[var]]'
+"

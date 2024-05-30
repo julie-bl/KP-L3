@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1716819173633.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "25FD9483",
+    "lastKnownWriteTime" : 1716821679,
+    "last_content_update" : 1716881439169,
+    "path" : "J:/4-Méthodologiste/Antoine/PANCREAS/Analyses_modelesPredictifs/code_Pancreas_global.Rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "647,16",
+        "scrollLine" : "618"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

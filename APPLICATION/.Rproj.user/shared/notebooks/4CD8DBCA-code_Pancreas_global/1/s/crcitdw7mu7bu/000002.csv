@@ -1,0 +1,149 @@
+"0","library(readxl)"
+"2","Message d'avis :
+"
+"2","R graphics engine version 16 is not supported by this version of RStudio. The Plots tab will be disabled until a newer version of RStudio is installed. 
+"
+"0","library(survival)"
+"0","library(survminer)"
+"2","Le chargement a nécessité le package : ggplot2
+"
+"2","Le chargement a nécessité le package : ggpubr
+"
+"2","Registered S3 method overwritten by 'data.table':
+  method           from
+  print.data.table     
+"
+"2","
+Attachement du package : ‘survminer’
+
+"
+"2","L'objet suivant est masqué depuis ‘package:survival’:
+
+    myeloma
+
+"
+"0","library(flextable)"
+"2","
+Attachement du package : ‘flextable’
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:ggpubr’:
+
+    border, font, rotate
+
+"
+"0","library(glmnet)"
+"2","Le chargement a nécessité le package : Matrix
+"
+"2","Loaded glmnet 4.1-8
+"
+"0","library(mice)"
+"2","
+Attachement du package : ‘mice’
+
+"
+"2","L'objet suivant est masqué depuis ‘package:stats’:
+
+    filter
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:base’:
+
+    cbind, rbind
+
+"
+"0","library(scoring)"
+"0","library(ggplot2)"
+"0","library(dplyr)"
+"2","
+Attachement du package : ‘dplyr’
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:stats’:
+
+    filter, lag
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","library(gtsummary)"
+"2","le package ‘gtsummary’ a été compilé avec la version R 4.3.2"
+"2","
+Attachement du package : ‘gtsummary’
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:flextable’:
+
+    as_flextable, continuous_summary
+
+"
+"0","library(lubridate)"
+"2","
+Attachement du package : ‘lubridate’
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:base’:
+
+    date, intersect, setdiff, union
+
+"
+"0","library(progress)"
+"2","le package ‘progress’ a été compilé avec la version R 4.3.2"
+"0","library(stringr)"
+"0","library(crayon)"
+"2","
+Attachement du package : ‘crayon’
+
+"
+"2","Les objets suivants sont masqués depuis ‘package:flextable’:
+
+    bold, italic, style
+
+"
+"2","L'objet suivant est masqué depuis ‘package:ggplot2’:
+
+    %+%
+
+"
+"0","library(survivalSL)"
+"2","le package ‘survivalSL’ a été compilé avec la version R 4.3.3"
+"2","Le chargement a nécessité le package : splines
+"
+"2","Registered S3 method overwritten by 'htmlwidgets':
+  method           from         
+  print.htmlwidget tools:rstudio
+"
+"0","library(RISCA)"
+"2","le package ‘RISCA’ a été compilé avec la version R 4.3.3"
+"2","Le chargement a nécessité le package : relsurv
+"
+"2","Le chargement a nécessité le package : date
+"
+"2","
+Attachement du package : ‘relsurv’
+
+"
+"2","L'objet suivant est masqué depuis ‘package:lubridate’:
+
+    years
+
+"
+"2","Le chargement a nécessité le package : reticulate
+"
+"2","Le chargement a nécessité le package : tune
+"
+"2","Registered S3 method overwritten by 'mosaic':
+  method                           from   
+  fortify.SpatialPolygonsDataFrame ggplot2
+"
+"2","Registered S3 method overwritten by 'RISCA':
+  method        from      
+  plot.rocrisca survivalSL
+"
+"0","library(openxlsx)"
+"2","le package ‘openxlsx’ a été compilé avec la version R 4.3.2"
+"0","library(DescTools)"
+"2","le package ‘DescTools’ a été compilé avec la version R 4.3.3"

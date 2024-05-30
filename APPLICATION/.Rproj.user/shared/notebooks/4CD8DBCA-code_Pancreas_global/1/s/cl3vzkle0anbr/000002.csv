@@ -1,0 +1,5 @@
+"0","save(mice(data, m = nb_BDD_completes, maxit = 20, predictorMatrix = p, method = m$method), file = ""J:/4-Méthodologiste/Antoine/pancreas/Resultats/MICE.RData"")
+"
+"2","Erreur dans save(mice(data, m = nb_BDD_completes, maxit = 20, predictorMatrix = p,  : 
+  objet ‘mice(data, m = nb_BDD_completes, maxit = 20, predictorMatrix = p, method = m$method)’ introuvable
+"

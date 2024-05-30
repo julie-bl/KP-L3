@@ -1,0 +1,5 @@
+"0","#Definition des variables TEMPS et STATUS"
+"0","data$time <- data$SG...debut.L3"
+"0","data$status <- data$Censure.SG"
+"0",""
+"0","data <- select(data, -c(SG...debut.L3,Censure.SG))"

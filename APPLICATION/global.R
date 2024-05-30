@@ -1,12 +1,24 @@
-#tata 2
-model_final <- function(X){
+model_final <- function(X,type=1){
   
   model <- X
   
-  for(cov in names(X)){
-    
-    model[,cov] <- X[,cov]*table_resultats[cov,"AVG"]
-    
+  if(type==1){
+    for(cov in names(X)){
+      
+      model[,cov] <- X[,cov]*table_resultats[cov,"AVG"]
+      RES_tmp <- RES
+      TIME_tmp <- TIME
+      
+    }
+  }
+  
+  if(type==2){
+    for(cov in names(X)){
+      
+      model[,cov] <- X[,cov]*table_resultats_SP[cov,"AVG"]
+      RES_tmp <- RES_SP
+      TIME_tmp <- TIME_SP
+    }
   }
   
   sum.model <- rowSums(model, na.rm = TRUE)
@@ -15,7 +27,7 @@ model_final <- function(X){
   
   for(i in 1:(nb_ech_bootstrap*nb_BDD_completes)){
     
-    tmp <- exp(matrix(exp(sum.model))%*%t(as.matrix(-1*RES$H0B[,i+1])))
+    tmp <- exp(matrix(exp(sum.model))%*%t(as.matrix(-1*RES_tmp$H0B[,i+1])))
     tmp[is.na(tmp)] <- 1
     pred.temp <- pred.temp + tmp
     
@@ -24,40 +36,32 @@ model_final <- function(X){
   pred <- pred.temp/(nb_ech_bootstrap*nb_BDD_completes)
   
   
-  table.temp <- data.frame(time = c(0,TIME$time), pred = c(1,pred[1,]))
+  table.temp <- data.frame(time = c(0,TIME_tmp$time), pred = c(1,pred[1,]))
   
-  median <- table.temp[table.temp$pred==max(table.temp[table.temp$pred<=0.5,]$pred),]$time
-  
-  list(model = sum.model, table = table.temp, median = median)
+  list(model = sum.model, table = table.temp)
   
 }
 
 
-graph <- function(X, median){
+graph <- function(X,type=1){
   
-  if(median == TRUE){
-    
-    ggplot(model_final(X)$table, aes(x = time, y = pred)) +
-      geom_step(color ="dodgerblue1" )+
-      labs(
-        x = "Survival time (months)",
-        y = "Progression-free survival") +
-      geom_segment(aes(x=model_final(X)$median, xend=model_final(X)$median, y=-Inf,  yend= 0.5),  linetype=2) +
-      geom_segment(aes(x=-Inf, xend=model_final(X)$median, y=0.5, yend=0.5),  linetype=2) +
-      theme_minimal() +
-      ylim(c(0,1))
-    
-  }else{
-    
-    ggplot(model_final(X)$table,aes(x = time, y = pred)) +
-      geom_step(color ="dodgerblue1" )+
-      labs(
-        x = "Survival time (months)",
-        y = "Progression-free survival") + 
-      theme_minimal() +
-      ylim(c(0,1))
-    
+  if(type==1){
+    t <- "Survival"
   }
   
+  if(type==2){
+    t <- "Free-progression survival"
+  }
+  
+  graphic <- plot_ly(data = model_final(X,type)$table, x = ~ round(time,digits = 2), y = ~ round(pred,digits = 3)) %>%
+    layout(title = "Predicted survival curve",
+           xaxis = list(title = "Time (months)"),
+           yaxis = list(title = t)) %>% config(
+             toImageButtonOptions = list(
+               format = "svg",
+               filename = "myplot",
+               width = 600,
+               height = 700))
+  add_lines(graphic, line= list(shape = 'hv'))
+  
 }
-
