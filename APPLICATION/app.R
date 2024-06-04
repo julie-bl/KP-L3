@@ -8,7 +8,6 @@ library(shinyjs)
 
 
 #############################################################################################
-source("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/global.R")
 
 #Survival
 
@@ -51,8 +50,8 @@ ui <- dashboardPage(
   dashboardBody(
     tabItems(
       tabItem(tabName = "one",
-              h4("ABSTRACT"),
-              h6("Pancreatique cancer is ranked 14th on the list of most common 
+              h3("ABSTRACT"),
+              h5("Pancreatique cancer is ranked 14th on the list of most common 
                  cancers, but it is the 7th leading cause of cancer-related death 
                  worldwide with 495,773 cases diagnosed and 466,003 deaths in 
                  2020. The pancreatic cancer prognosis remain very low, with a 
@@ -61,24 +60,24 @@ ui <- dashboardPage(
                  disease evolution is the stage of the tumor at diagnosis. Only
                  20% of the patient affected by this cancer have a surgically 
                  resectable disease at diagnosis."),
-              h6("In France, between 1990 and 2018, the annual incidence rate
+              h5("In France, between 1990 and 2018, the annual incidence rate
                  of pancreatic cancer has increased. Pancreatic adenocarcinoma
                  (PA) could become the second cause of the cancer mortality
                  during the year 2030-2040."),
-              h6("After the failure of the first two lines treatment, the
+              h5("After the failure of the first two lines treatment, the
                  prognosis of patients is even worse. the decision to prescibe 
                  a third line treatment must be discussed  with the patient.
                  In view of the many adverse effects on the quality of the patient 
                  life, predicting life expectancy of patients receiving a third 
                  line treatment would be an important decision-making tool."),
-              h4("METHOLOGY"),
-              h6("The model is composed of means of regression coefficients of
-                 Cox models selected with a LASSO penalty."),
-              h6("The model have been train on a multicenter french cohort of 
-                 202 patients suffering from PA with a third line chimiotherapy
-                 treatment between 2009 and 2019."),
-              h6("The complete methology at this link : "),
-              h6("Welcome to the KP-L3 application, a decision-making tool.
+              h3("METHOLOGY"),
+              h5("The model is composed of means of regression coefficients of
+                 Cox models selected with a LASSO penalty. It have been train on 
+                 a multicenter french cohort of 202 patients suffering from PA 
+                 with a third line chimiotherapy treatment between 2009 and 2019."),
+              h5("The complete methology at this link : "),
+              h5(" "),
+              h4("Welcome to the KP-L3 application, a decision-making tool.
                 This application is devoted to the calculation of the 
                 survival and free progression survival after a second 
                 line treatment of pancreatic adenocarcinoma.To get 
@@ -117,7 +116,7 @@ ui <- dashboardPage(
                   fluidRow(
                     radioButtons(inputId = "NMSD",
                                  label = "Metastatic site(s) at diagnosis",
-                                 choices = c("Yes","No"),
+                                 choiceNames = c("Yes","No"),
                                  choiceValues = c(1, 0)),
                     sliderInput(inputId = "SSP1",
                                 label = "Duration of the first line treatment in months",
@@ -161,6 +160,75 @@ ui <- dashboardPage(
 
 server <- function(input, output){
   
+  model_final <- function(X,type=1){
+    
+    model <- X
+    
+    if(type==1){
+      for(cov in names(X)){
+        
+        model[,cov] <- X[,cov]*table_resultats[cov,"AVG"]
+        RES_tmp <- RES
+        TIME_tmp <- TIME
+        
+      }
+    }
+    
+    if(type==2){
+      for(cov in names(X)){
+        
+        model[,cov] <- X[,cov]*table_resultats_SP[cov,"AVG"]
+        RES_tmp <- RES_SP
+        TIME_tmp <- TIME_SP
+      }
+    }
+    
+    sum.model <- rowSums(model, na.rm = TRUE)
+    
+    pred.temp <- 0
+    
+    for(i in 1:(nb_ech_bootstrap*nb_BDD_completes)){
+      
+      tmp <- exp(matrix(exp(sum.model))%*%t(as.matrix(-1*RES_tmp$H0B[,i+1])))
+      tmp[is.na(tmp)] <- 1
+      pred.temp <- pred.temp + tmp
+      
+    }
+    
+    pred <- pred.temp/(nb_ech_bootstrap*nb_BDD_completes)
+    
+    
+    table.temp <- data.frame(time = c(0,TIME_tmp$time), pred = c(1,pred[1,]))
+    
+    list(model = sum.model, table = table.temp)
+    
+  }
+  
+  
+  graph <- function(X,type=1){
+    
+    if(type==1){
+      t <- "Survival"
+    }
+    
+    if(type==2){
+      t <- "Free-progression survival"
+    }
+    
+    graphic <- plot_ly(data = model_final(X,type)$table, x = ~ round(time,digits = 2), y = ~ round(pred,digits = 3)) %>%
+      layout(title = "Predicted survival curve",
+             xaxis = list(title = "Time (months)"),
+             yaxis = list(title = t)) %>% config(
+               toImageButtonOptions = list(
+                 format = "svg",
+                 filename = "myplot",
+                 width = 600,
+                 height = 700))
+    add_lines(graphic, line= list(shape = 'hv'))
+    
+  }
+  
+  
   y <- reactive(input$MHL3)
   MHL3non <- reactive( if (y()=="No") 1 else 0 )
   MHL3isolee <- reactive( if (y()=="Isolated") 1 else 0 )
@@ -173,7 +241,7 @@ server <- function(input, output){
                            Protocole_L1groupebis = as.integer(input$PL1),
                            Meta.pulm_L3 = as.integer(input$MPL3),
                            Carcinose_L3 = as.integer(input$CL3),
-                           Nbre.de.site.metastatique_dg_1 = as.integer(input$NMSD),
+                           Nbre.de.site.metastatique_dg = as.integer(input$NMSD),
                            Meta.hep_L3_isolee = MHL3isolee(),
                            Meta.hep_L3_non = MHL3non()
   ))

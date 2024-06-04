@@ -1,3 +1,5 @@
+library(plotly)
+
 model_final <- function(X,type=1){
   
   model <- X
