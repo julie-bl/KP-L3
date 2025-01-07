@@ -5,31 +5,32 @@ library(DT)
 library(RISCA)
 library(plotly)
 library(shinyjs)
+library(shinycssloaders)
 
 
 #############################################################################################
 
 #Survival
 
-load(url("https://github.com/Pelras-A/KP-L3/raw/main/APPLICATION/RES.RData"))
-table_resultats <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/table_resultats.csv")
+load("RES.RData")
+table_resultats <- read.csv("table_resultats.csv")
 tmp <- table_resultats$X
 table_resultats <- data.frame(table_resultats[,-1])
 row.names(table_resultats) <- tmp
 rm(tmp)
-TIME <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/TIME.csv")
+TIME <- read.csv("TIME.csv")
 
 
 
 #Free progression survival
 
-load(url("https://github.com/Pelras-A/KP-L3/raw/main/APPLICATION/RES_SP.RData"))
-table_resultats_SP <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/table_resultats_SP.csv")
+load("RES_SP.RData")
+table_resultats_SP <- read.csv("table_resultats_SP.csv")
 tmp <- table_resultats_SP$X
 table_resultats_SP <- data.frame(table_resultats_SP[,-1])
 row.names(table_resultats_SP) <- tmp
 rm(tmp)
-TIME_SP <- read.csv("https://raw.githubusercontent.com/Pelras-A/KP-L3/main/APPLICATION/TIME_SP.csv")
+TIME_SP <- read.csv("TIME_SP.csv")
 
 
 
@@ -39,61 +40,32 @@ nb_BDD_completes <- 5
 #############################################################################################
 
 ui <- dashboardPage(
-  dashboardHeader(title = "KP-L3"),
+  dashboardHeader(title = "Prognosis of patient with unresecable pencreatic cancer",
+                  titleWidth = "100%"),
   dashboardSidebar(
+    title = p(a(tags$img(src='Logo-Horizontal-CHU-Poitiers_Couleurs.jpg', width=230,align = "center"),
+                target="_blank", href="https://www.chu-poitiers.fr", class="hidden-xs"),
+              style="padding-left:0px !important"),
     sidebarMenu(
-      menuItem("Welcome", tabName = "one"),
-      menuItem("Calculator", tabName = "two"),
-      menuItem("References", tabName = "three")
+      menuItem("Calculator", tabName = "one"),
+      menuItem("Read Me", tabName = "two")
     )
   ),
   dashboardBody(
     tabItems(
       tabItem(tabName = "one",
-              h3("ABSTRACT"),
-              h5("Pancreatique cancer is ranked 14th on the list of most common 
-                 cancers, but it is the 7th leading cause of cancer-related death 
-                 worldwide with 495,773 cases diagnosed and 466,003 deaths in 
-                 2020. The pancreatic cancer prognosis remain very low, with a 
-                 5 year survival rate lower than 10%. This is often due to the 
-                 delayed onset of the first symptoms. The main factor of the 
-                 disease evolution is the stage of the tumor at diagnosis. Only
-                 20% of the patient affected by this cancer have a surgically 
-                 resectable disease at diagnosis."),
-              h5("In France, between 1990 and 2018, the annual incidence rate
-                 of pancreatic cancer has increased. Pancreatic adenocarcinoma
-                 (PA) could become the second cause of the cancer mortality
-                 during the year 2030-2040."),
-              h5("After the failure of the first two lines treatment, the
-                 prognosis of patients is even worse. the decision to prescibe 
-                 a third line treatment must be discussed  with the patient.
-                 In view of the many adverse effects on the quality of the patient 
-                 life, predicting life expectancy of patients receiving a third 
-                 line treatment would be an important decision-making tool."),
-              h3("METHOLOGY"),
-              h5("The model is composed of means of regression coefficients of
-                 Cox models selected with a LASSO penalty. It have been train on 
-                 a multicenter french cohort of 202 patients suffering from PA 
-                 with a third line chimiotherapy treatment between 2009 and 2019."),
-              h5("The complete methology at this link : "),
-              h5(" "),
-              h4("Welcome to the KP-L3 application, a decision-making tool.
-                This application is devoted to the calculation of the 
-                survival and free progression survival after a second 
-                line treatment of pancreatic adenocarcinoma.To get 
-                started, click on the calculator widget.")),
-      tabItem(tabName = "two",
-              box(
-                column(
-                  width = 6,
-                  radioButtons(inputId = "SEXE",
-                               label = "Sex",
-                               choiceNames = c("M", "F"),
-                               choiceValues = c(1, 0)),
-                  sliderInput(inputId = "AGE",
-                              label = "Age in years",
-                              min = 18,
-                              max = 99,
+              tabBox(tabPanel(h4("The patient characteristics",style = "color: #2874A6;")),
+                     fluidRow(
+                       column(
+                         width = 6,
+                         radioButtons(inputId = "SEXE",
+                                      label = "Sex",
+                                      choiceNames = c("M", "F"),
+                                      choiceValues = c(1, 0)),
+                         sliderInput(inputId = "AGE",
+                                     label = "Age in years",
+                                     min = 18,
+                                     max = 99,
                               value = 30),
                   radioButtons(inputId = "RP",
                                label = "Primary resection",
@@ -112,7 +84,7 @@ ui <- dashboardPage(
                               choices = c("No","Isolated","With others"))
                 ),
                 column(
-                  width = 6,
+                  width = 5,
                   fluidRow(
                     radioButtons(inputId = "NMSD",
                                  label = "Metastatic site(s) at diagnosis",
@@ -138,22 +110,38 @@ ui <- dashboardPage(
                 )
                 
                 
+              )
               ),
+                
               tabBox(
-                tabPanel("Survival prediction",
-                         plotlyOutput("CURVE_Survival"),
+                tabPanel(h4("Overall survival prediction",style = "color: #2874A6;"),
+                         plotlyOutput("CURVE_Survival")%>% withSpinner(),
                          div(style = "height:50px"),
                          verbatimTextOutput("EV")
                 ),
-                tabPanel("Free progression survival prediction",
-                         plotlyOutput("CURVE_SurvivalSP"),
+                tabPanel(h4("Free progression survival prediction",style = "color: #2874A6;"),
+                         plotlyOutput("CURVE_SurvivalSP")%>% withSpinner(),
                          div(style = "height:50px"),
                          verbatimTextOutput("EV_SP"))
               )
       ),
-      tabItem(tabName = "three"
-      )
-    )
+      tabItem(tabName = "two",
+              h5("In Evrard et al. (preprint available here), two multivariate models were proposed to predict of both 
+                 the progression-free survival (PFS) and overall survival (OS)"),
+              h5("The study was based on a French multicenter cohort constituted by French patients treated for 
+                 unresectable pancreatic adenocarcinoma."),
+              h5("The following factors contributing to the predictions: age, gender, surgery of the primary tumor, 
+                 Folfirinox as first-line therapy,metastatic  site at diagnosis, durations of first and second-line 
+                 treatments; and at third-line treatment: carcinosis, liver and/or lung metastasis."),
+              h5("It allowed for acceptable discrimination between event and event-free patients at 6 months post 
+                 third-line initiation (area under the ROC curve of 0.83 [95%CI: 0.75 - 0.90] for the PFS and 
+                 0.73 [95%CI: 0.65 - 0.81] for the OS)."),
+              h5("The related online calculator is available via this web-based application. It could help in informing 
+                 both the physician and patient of the disease prognosis."),
+              h5("The complete methology at this link : ")
+              )
+    ),
+    
   )
 )
 
@@ -208,7 +196,7 @@ server <- function(input, output){
   graph <- function(X,type=1){
     
     if(type==1){
-      t <- "Survival"
+      t <- "Overall survival"
     }
     
     if(type==2){
@@ -216,7 +204,7 @@ server <- function(input, output){
     }
     
     graphic <- plot_ly(data = model_final(X,type)$table, x = ~ round(time,digits = 2), y = ~ round(pred,digits = 3)) %>%
-      layout(title = "Predicted survival curve",
+      layout(
              xaxis = list(title = "Time (months)"),
              yaxis = list(title = t)) %>% config(
                toImageButtonOptions = list(
@@ -263,9 +251,9 @@ server <- function(input, output){
                        type = "s"))
   
   output$EV <- renderText(paste0("Life expectancy = ", round(MST(), digits = 1), " month(s)", "\n", "\n",
-                                 "Survival at 3 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[50,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Survival at 6 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[94,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Survival at 12 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[136,"time"],"pred"], digits = 3)))
+                                 "Overall survival at 3 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[50,"time"],"pred"], digits = 3), "\n", "\n",
+                                 "Overall survival at 6 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[94,"time"],"pred"], digits = 3), "\n", "\n",
+                                 "Overall survival at 12 months = ", round(model_final(X(),type=1)$table[model_final(X(),type=1)$table$time == TIME[136,"time"],"pred"], digits = 3)))
   
   
   
@@ -280,14 +268,14 @@ server <- function(input, output){
   })
   
   MST_SP <- reactive(rmst(times = model_final(X(),type = 2)$table$time,
-                       surv.rates = model_final(X(),type = 2)$table$pred,
-                       max.time = max(model_final(X(),type = 2)$table$time),
-                       type = "s"))
+                          surv.rates = model_final(X(),type = 2)$table$pred,
+                          max.time = max(model_final(X(),type = 2)$table$time),
+                          type = "s"))
   
   output$EV_SP <- renderText(paste0("Life expectancy without progression = ", round(MST_SP(), digits = 1), " month(s)", "\n", "\n",
-                                 "Free-progression survival at 3 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[63,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Free-progression survival at 6 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[89,"time"],"pred"], digits = 3), "\n", "\n",
-                                 "Free-progression survival at 12 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[106,"time"],"pred"], digits = 3)))
+                                    "Free-progression survival at 3 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[63,"time"],"pred"], digits = 3), "\n", "\n",
+                                    "Free-progression survival at 6 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[89,"time"],"pred"], digits = 3), "\n", "\n",
+                                    "Free-progression survival at 12 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[106,"time"],"pred"], digits = 3)))
   
   observeEvent(input$btn_go, {
     shinyjs::show(id = "hiddenbox")
@@ -296,4 +284,3 @@ server <- function(input, output){
 
 
 shinyApp(ui, server)
-
