@@ -71,41 +71,50 @@ ui <- dashboardPage(
                                label = "Primary resection",
                                choiceNames = c("Yes", "No"),
                                choiceValues = c(1, 0)),
-                  radioButtons(inputId = "MPL3",
-                               label = "Lung metastasis at third line prescription",
-                               choiceNames = c("Yes", "No"),
+                  radioButtons(inputId = "NMSD",
+                               label = "Metastatic site(s) at diagnosis",
+                               choiceNames = c("Yes","No"),
                                choiceValues = c(1, 0)),
-                  radioButtons(inputId = "CL3",
-                               label = "Carcinosis at third line prescription",
-                               choiceNames = c("Yes", "No"),
-                               choiceValues = c(1,0)),
-                  selectInput(inputId = "MHL3",
-                              label = "Hepatic metastasis at third line prescription",
-                              choices = c("No","Isolated","With others"))
+                  sliderInput(inputId = "SSP1",
+                              label = "Duration of the first line treatment in months",
+                              value = 3,
+                              min = 0.1,
+                              max = 50,
+                              step = 0.1),
+                  radioButtons(inputId = "PL1",
+                               label = "Protocol followed during the first line treatment",
+                               choiceNames = c("Folfirinox", "Others"),
+                               choiceValues = c(1, 0))
+                  
                 ),
                 column(
                   width = 5,
                   fluidRow(
-                    radioButtons(inputId = "NMSD",
-                                 label = "Metastatic site(s) at diagnosis",
-                                 choiceNames = c("Yes","No"),
-                                 choiceValues = c(1, 0)),
-                    sliderInput(inputId = "SSP1",
-                                label = "Duration of the first line treatment in months",
-                                value = 3,
-                                min = 0.1,
-                                max = 50,
-                                step = 0.1),
-                    radioButtons(inputId = "PL1",
-                                 label = "Protocol followed during the first line treatment",
-                                 choiceNames = c("Folfirinox", "Others"),
-                                 choiceValues = c(1, 0)),
                     sliderInput(inputId = "SSP2",
                                 label = "Duration of the second line treatment in months",
                                 value = 2,
                                 min = 0.1,
                                 max = 50,
-                                step = 0.1)
+                                step = 0.1),
+                    radioButtons(inputId = "ET",
+                                 label = "Depletion of therapeutic resources* at third line prescription",
+                                 choiceNames = c("Yes", "No"),
+                                 choiceValues = c(1,0)),
+                    radioButtons(inputId = "ECOGPS",
+                                 label = "ECOG PS at third line prescription",
+                                 choiceNames = c("0-1", "≥2"),
+                                 choiceValues = c(0,1)),
+                    radioButtons(inputId = "MPL3",
+                                 label = "Lung metastasis at third line prescription",
+                                 choiceNames = c("Yes", "No"),
+                                 choiceValues = c(1, 0)),
+                    radioButtons(inputId = "CL3",
+                                 label = "Carcinosis at third line prescription",
+                                 choiceNames = c("Yes", "No"),
+                                 choiceValues = c(1,0)),
+                    selectInput(inputId = "MHL3",
+                                label = "Hepatic metastasis at third line prescription",
+                                choices = c("No","Isolated","With others"))
                   )
                 )
                 
@@ -231,7 +240,10 @@ server <- function(input, output){
                            Carcinose_L3 = as.integer(input$CL3),
                            Nbre.de.site.metastatique_dg = as.integer(input$NMSD),
                            Meta.hep_L3_isolee = MHL3isolee(),
-                           Meta.hep_L3_non = MHL3non()
+                           Meta.hep_L3_non = MHL3non(),
+                           Epuisement.therap = as.integer(input$ET),
+                           OMS_L3.regroupe = as.integer(input$ECOGPS)
+                           
   ))
   
   
