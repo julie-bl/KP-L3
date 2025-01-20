@@ -148,8 +148,7 @@ ui <- dashboardPage(
                  third-line initiation (area under the ROC curve of 0.83 [95%CI: 0.75 - 0.90] for the PFS and 
                  0.73 [95%CI: 0.65 - 0.81] for the OS)."),
               h5("The related online calculator is available via this web-based application. It could help in informing 
-                 both the physician and patient of the disease prognosis."),
-              h5("The complete methology at this link : ")
+                 both the physician and patient of the disease prognosis.")
               )
     ),
     
