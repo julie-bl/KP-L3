@@ -43,7 +43,7 @@ ui <- dashboardPage(
   dashboardHeader(title = "Prognosis of patients with unresecable pancreatic cancer from the third-line treatment",
                   titleWidth = "100%"),
   dashboardSidebar(
-    title = p(a(tags$img(src='Logo-Horizontal-CHU-Poitiers_Couleurs.jpg', width=230,align = "center"),
+    title = p(a(tags$img(src='LOGO.jpeg', width=230,align = "center"),
                 target="_blank", href="https://www.chu-poitiers.fr", class="hidden-xs"),
               style="padding-left:0px !important"),
     sidebarMenu(
