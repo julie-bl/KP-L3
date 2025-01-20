@@ -40,7 +40,7 @@ nb_BDD_completes <- 5
 #############################################################################################
 
 ui <- dashboardPage(
-  dashboardHeader(title = "Prognosis of patients with unresecable pencreatic cancer from the third line treatment",
+  dashboardHeader(title = "Prognosis of patients with unresecable pancreatic cancer from the third-line treatment",
                   titleWidth = "100%"),
   dashboardSidebar(
     title = p(a(tags$img(src='Logo-Horizontal-CHU-Poitiers_Couleurs.jpg', width=230,align = "center"),
@@ -76,13 +76,13 @@ ui <- dashboardPage(
                                choiceNames = c("Yes","No"),
                                choiceValues = c(1, 0)),
                   sliderInput(inputId = "SSP1",
-                              label = "Duration of the first line treatment in months",
+                              label = "Duration of the first-line treatment in months",
                               value = 3,
                               min = 0.1,
                               max = 50,
                               step = 0.1),
                   radioButtons(inputId = "PL1",
-                               label = "Protocol followed during the first line treatment",
+                               label = "Protocol followed during the first-line treatment",
                                choiceNames = c("Folfirinox", "Others"),
                                choiceValues = c(1, 0))
                   
@@ -91,29 +91,29 @@ ui <- dashboardPage(
                   width = 5,
                   fluidRow(
                     sliderInput(inputId = "SSP2",
-                                label = "Duration of the second line treatment in months",
+                                label = "Duration of the second-line treatment in months",
                                 value = 2,
                                 min = 0.1,
                                 max = 50,
                                 step = 0.1),
                     radioButtons(inputId = "ET",
-                                 label = "Depletion of therapeutic resources at third line prescription",
+                                 label = "Depletion of therapeutic resources at third-line prescription",
                                  choiceNames = c("Yes", "No"),
                                  choiceValues = c(1,0)),
                     radioButtons(inputId = "ECOGPS",
-                                 label = "ECOG PS at third line prescription",
+                                 label = "ECOG PS at third-line prescription",
                                  choiceNames = c("0-1", "≥2"),
                                  choiceValues = c(0,1)),
                     radioButtons(inputId = "MPL3",
-                                 label = "Lung metastasis at third line prescription",
+                                 label = "Lung metastasis at third-line prescription",
                                  choiceNames = c("Yes", "No"),
                                  choiceValues = c(1, 0)),
                     radioButtons(inputId = "CL3",
-                                 label = "Carcinosis at third line prescription",
+                                 label = "Carcinosis at third-line prescription",
                                  choiceNames = c("Yes", "No"),
                                  choiceValues = c(1,0)),
                     selectInput(inputId = "MHL3",
-                                label = "Hepatic metastasis at third line prescription",
+                                label = "Hepatic metastasis at third-line prescription",
                                 choices = c("No","Isolated","With others"))
                   )
                 )
@@ -128,26 +128,26 @@ ui <- dashboardPage(
                          div(style = "height:50px"),
                          verbatimTextOutput("EV")
                 ),
-                tabPanel(h4("Free progression survival prediction",style = "color: #2874A6;"),
+                tabPanel(h4("Progression-free survival prediction",style = "color: #2874A6;"),
                          plotlyOutput("CURVE_SurvivalSP")%>% withSpinner(),
                          div(style = "height:50px"),
                          verbatimTextOutput("EV_SP"))
               )
       ),
       tabItem(tabName = "two",
-              h5("In Evrard et al. (preprint available here), two multivariate models were proposed to predict of both 
+              h4("In Evrard et al. (preprint available here), two multivariate models were proposed to predict of both 
                  the progression-free survival (PFS) and overall survival (OS)"),
-              h5("The study was based on a French multicenter cohort constituted by French patients treated for 
+              h4("The study was based on a French multicenter cohort constituted by French patients treated for 
                  unresectable pancreatic adenocarcinoma."),
-              h5("The following factors contributing to the predictions: gender, age, surgery of the primary tumor, 
+              h4("The following factors contributing to the predictions: gender, age, surgery of the primary tumor, 
                  metastatic  site at diagnosis, Folfirinox as first-line therapy, durations of first and second-line 
                  treatments; and at third-line treatment: depletion therapeutic (defined as a patient having already 
                  received 5-fluoruracil, oxaliplatine, irinotecan, gemcitabine and taxane at the beginning of L3), 
                  ECOG PS level, liver and/or lung metastasis and carcinosis."),
-              h5("It allowed for acceptable discrimination between event and event-free patients at 6 months post 
+              h4("It allowed for acceptable discrimination between event and event-free patients at 6 months post 
                  third-line initiation (area under the ROC curve of 0.83 [95%CI: 0.75 - 0.90] for the PFS and 
                  0.73 [95%CI: 0.65 - 0.81] for the OS)."),
-              h5("The related online calculator is available via this web-based application. It could help in informing 
+              h4("The related online calculator is available via this web-based application. It could help in informing 
                  both the physician and patient of the disease prognosis.")
               )
     ),
@@ -210,7 +210,7 @@ server <- function(input, output){
     }
     
     if(type==2){
-      t <- "Free-progression survival"
+      t <- "Progression-free survival"
     }
     
     graphic <- plot_ly(data = model_final(X,type)$table, x = ~ round(time,digits = 2), y = ~ round(pred,digits = 3)) %>%
@@ -286,9 +286,9 @@ server <- function(input, output){
                           type = "s"))
   
   output$EV_SP <- renderText(paste0("Life expectancy without progression = ", round(MST_SP(), digits = 1), " month(s)", "\n", "\n",
-                                    "Free-progression survival at 3 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[63,"time"],"pred"], digits = 3), "\n", "\n",
-                                    "Free-progression survival at 6 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[89,"time"],"pred"], digits = 3), "\n", "\n",
-                                    "Free-progression survival at 12 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[106,"time"],"pred"], digits = 3)))
+                                    "Progression-free survival at 3 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[63,"time"],"pred"], digits = 3), "\n", "\n",
+                                    "Progression-free survival at 6 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[89,"time"],"pred"], digits = 3), "\n", "\n",
+                                    "Progression-free survival at 12 months = ", round(model_final(X(),type = 2)$table[model_final(X(),type = 2)$table$time == TIME_SP[106,"time"],"pred"], digits = 3)))
   
   observeEvent(input$btn_go, {
     shinyjs::show(id = "hiddenbox")
