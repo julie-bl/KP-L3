@@ -6,6 +6,8 @@ library(RISCA)
 library(plotly)
 library(shinyjs)
 library(shinycssloaders)
+library(shinyBS)
+library(bsplus)
 
 
 #############################################################################################
@@ -83,7 +85,7 @@ ui <- dashboardPage(
                               step = 0.1),
                   radioButtons(inputId = "PL1",
                                label = "Protocol followed during the first-line treatment",
-                               choiceNames = c("Folfirinox", "Others"),
+                               choiceNames = c("Folfirinox", "Other"),
                                choiceValues = c(1, 0))
                   
                 ),
@@ -99,11 +101,21 @@ ui <- dashboardPage(
                     radioButtons(inputId = "ET",
                                  label = "Depletion of therapeutic resources at third-line prescription",
                                  choiceNames = c("Yes", "No"),
-                                 choiceValues = c(1,0)),
+                                 choiceValues = c(1,0))%>%
+                      shinyInput_label_embed(
+                        shiny_iconlink() %>%
+                          bs_embed_tooltip("Has the patient already received 5-fluorouracil, 
+                                                    oxaliplatin, irinotecan, gemcitabine, and a taxane 
+                                                    (nab-paclitaxel, paclitaxel, or docetaxel) ?",
+                                           placement = "right")),
                     radioButtons(inputId = "ECOGPS",
                                  label = "ECOG PS at third-line prescription",
                                  choiceNames = c("0-1", "≥2"),
-                                 choiceValues = c(0,1)),
+                                 choiceValues = c(0,1))%>%
+                      shinyInput_label_embed(
+                        shiny_iconlink() %>%
+                          bs_embed_tooltip("ECOG PS = Eastern Cooperative Oncology Group Performance Status",
+                                           placement = "right")),
                     radioButtons(inputId = "MPL3",
                                  label = "Lung metastasis at third-line prescription",
                                  choiceNames = c("Yes", "No"),
@@ -114,7 +126,7 @@ ui <- dashboardPage(
                                  choiceValues = c(1,0)),
                     selectInput(inputId = "MHL3",
                                 label = "Hepatic metastasis at third-line prescription",
-                                choices = c("No","Isolated","With others"))
+                                choices = c("No","Isolated","With other"))
                   )
                 )
                 
@@ -135,19 +147,19 @@ ui <- dashboardPage(
               )
       ),
       tabItem(tabName = "two",
-              h4("In Evrard et al. (preprint available here), two multivariate models were proposed to predict of both 
+              h4(style="text-align: justify;","In Evrard et al. (preprint available here), two multivariate models were proposed to predict of both 
                  the progression-free survival (PFS) and overall survival (OS)"),
-              h4("The study was based on a French multicenter cohort constituted by French patients treated for 
+              h4(style="text-align: justify;","The study was based on a French multicenter cohort constituted by French patients treated for 
                  unresectable pancreatic adenocarcinoma."),
-              h4("The following factors contributing to the predictions: gender, age, surgery of the primary tumor, 
+              h4(style="text-align: justify;","The following factors contributing to the predictions: gender, age, surgery of the primary tumor, 
                  metastatic  site at diagnosis, Folfirinox as first-line therapy, durations of first and second-line 
                  treatments; and at third-line treatment: depletion therapeutic (defined as a patient having already 
                  received 5-fluoruracil, oxaliplatine, irinotecan, gemcitabine and taxane at the beginning of L3), 
                  ECOG PS level, liver and/or lung metastasis and carcinosis."),
-              h4("It allowed for acceptable discrimination between event and event-free patients at 6 months post 
+              h4(style="text-align: justify;","It allowed for acceptable discrimination between event and event-free patients at 6 months post 
                  third-line initiation (area under the ROC curve of 0.83 [95%CI: 0.75 - 0.90] for the PFS and 
                  0.73 [95%CI: 0.65 - 0.81] for the OS)."),
-              h4("The related online calculator is available via this web-based application. It could help in informing 
+              h4(style="text-align: justify;","The related online calculator is available via this web-based application. It could help in informing 
                  both the physician and patient of the disease prognosis.")
               )
     ),
@@ -292,6 +304,11 @@ server <- function(input, output){
   
   observeEvent(input$btn_go, {
     shinyjs::show(id = "hiddenbox")
+  })
+  
+  #INFO BUTTONS
+  observeEvent(input$infoSex, {
+    showModal(modalDialog("hello"))
   })
 }
 
