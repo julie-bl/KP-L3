@@ -54,6 +54,7 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    # includeCSS("styles.css"),  # Inclure le fichier CSS
     tabItems(
       tabItem(tabName = "one",
               tabBox(tabPanel(h4("The patient characteristics",style = "color: #2874A6;")),
@@ -147,7 +148,11 @@ ui <- dashboardPage(
               )
       ),
       tabItem(tabName = "two",
-              h4(style="text-align: justify;","In Evrard et al. (preprint available here), two multivariate models were proposed to predict of both 
+              h4(style="text-align: justify;","In ",tags$a(target="_blank", 
+                                                href="https://academic.oup.com/oncolo/article/30/6/oyaf125/8162465?searchresult=1", 
+                                                class="hidden-xs",
+                                                "Evrard et al."),
+                 ", two multivariate models were proposed to predict of both 
                  the progression-free survival (PFS) and overall survival (OS)"),
               h4(style="text-align: justify;","The study was based on a French multicenter cohort constituted by French patients treated for 
                  unresectable pancreatic adenocarcinoma."),
@@ -314,3 +319,22 @@ server <- function(input, output){
 
 
 shinyApp(ui, server)
+
+
+
+
+
+
+X <- data.frame(Sexe = 1,
+                Age_L3 = 50,
+                log_SSP1 = 6,
+                log_SSP2 = 11,
+                Resection.primitif = 0,
+                Protocole_L1groupebis = 1,
+                Meta.pulm_L3 = 0,
+                Carcinose_L3 = 1,
+                Nbre.de.site.metastatique_dg = 0,
+                Meta.hep_L3_isolee =0,
+                Meta.hep_L3_non =0,
+                Epuisement.therap = 1,
+                OMS_L3.regroupe = 0)
