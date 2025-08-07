@@ -1,0 +1,859 @@
+/*
+/* Header - Conteneur principal avec fond bleu et centrage */
+.main-header {
+  background-color: #05506d !important;
+  padding: 15px 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 70px !important;
+  width: 100% !important;
+}
+
+/* Masquer tous les boutons de navigation et menus hamburgers */
+.main-header .navbar-toggle,
+.main-header .sidebar-toggle,
+.main-header .navbar-custom-menu,
+.main-header .navbar-nav,
+.main-header .dropdown {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Navbar - fond bleu uniforme */
+.main-header .navbar {
+  background-color: #05506d !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+
+/* Éléments de titre - style unifié pour tous les conteneurs de texte */
+.main-header .navbar-header,
+.main-header .navbar-brand,
+.main-header > span,
+.skin-blue .main-header .navbar-brand {
+  color: white !important;
+  background-color: #05506d !important;
+  font-size: 25px !important;
+  line-height: 1.4 !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 100% !important;
+  padding: 15px 20px !important;
+  margin: 0 !important;
+  min-height: 70px !important;
+  box-sizing: border-box !important;
+  float: none !important;
+  position: static !important;
+}
+
+
+/* Sidebar - transformation en barre horizontale */
+.main-sidebar {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  height: 50px !important;
+  background-color: #383838 !important;
+  z-index: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  float: none !important;
+  overflow: visible !important;
+  display: block !important;
+  visibility: visible !important;
+  padding: 0 !important;
+}
+
+/* Sidebar interne - conteneur flex pour alignement horizontal */
+.main-sidebar .sidebar {
+  background-color: #383838 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin: 0px !important;
+}
+
+/* Logo dans sidebar - éléments de structure du logo */
+.main-sidebar .sidebar > p,
+.main-sidebar .sidebar > .sidebar-title,
+.main-sidebar .sidebar > div:first-child {
+  display: flex !important;
+  align-items: center !important;
+  height: 50px !important;
+  margin: 0px !important;
+  padding: 0 !important;
+}
+
+/* Liens et paragraphes dans sidebar - formatage des conteneurs de logo */
+.main-sidebar p,
+.main-sidebar p a {
+  display: flex !important;
+  align-items: center !important;
+  height: 50px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+}
+
+/* Images dans sidebar - dimensionnement du logo */
+.main-sidebar img {
+  height: 50px !important;
+  width: auto !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+}
+
+/* Menu de navigation - disposition horizontale */
+.sidebar-menu {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 20px !important;
+  list-style: none !important;
+  height: 50px !important;
+  visibility: visible !important;
+}
+
+/* Éléments de menu - items individuels avec séparateurs */
+.sidebar-menu > li {
+  display: flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-right: 1px solid #555 !important;
+  height: 50px !important;
+  visibility: visible !important;
+}
+
+/* Dernier élément de menu - suppression du séparateur final */
+.sidebar-menu > li:last-child {
+  border-right: none !important;
+}
+
+/* Liens de menu - style des boutons de navigation */
+.sidebar-menu > li > a {
+  display: flex !important;
+  align-items: center !important;
+  height: 50px !important;
+  padding: 0px 10px !important;
+  color: white !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  white-space: nowrap !important;
+  visibility: visible !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  border-right: solid 1px #d9632b !important;
+  margin: 0px !important;
+  border-left: none !important;
+}
+
+/* Menu hover - effet de survol */
+.sidebar-menu > li > a:hover {
+  background-color: #666666 !important;
+  color: white !important;
+  border-left: none !important;
+}
+
+/* Menu actif - état sélectionné */
+.sidebar-menu > li.active > a {
+  background-color: #666666 !important;
+  color: white !important;
+  border-left: none !important;
+}
+
+/* Zone de contenu principale - wrapper du contenu Shiny */
+.content-wrapper {
+  margin-left: 0 !important;
+  margin-top: 0 !important;
+  background-color: white !important;
+  min-height: calc(100vh - 130px) !important;
+  padding: 10px !important;
+  position: relative !important;
+  z-index: auto !important;
+}
+
+/* Contenu au-dessus de la barre - z-index pour superposition */
+.content-wrapper > * {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Page entière - fond blanc uniforme */
+html, body {
+  background-color: white !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important; /* Nécessaire pour la barre verticale */
+}
+
+/* Ligne verticale centrale - séparateur visuel contrôlé par JavaScript */
+body::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+
+  top: 120px !important;
+  bottom: 0 !important;
+  width: 2px !important;
+  background-color: #383838 !important;
+  z-index: 1 !important;
+  transform: translateX(-50%) !important;
+  min-height: calc(100vh - 120px) !important;
+  display: none !important; /* Cachée par défaut */
+}
+
+/* Affichage conditionnel de la barre - classe CSS activée par JS */
+body.show-vertical-bar::after {
+  display: block !important;
+}
+
+/* Contenu et onglets - fond blanc et couleurs de base */
+.content, .tab-content {
+  background-color: white !important;
+  color: black !important;
+  position: static !important; /* Position statique normale */
+  z-index: auto !important; /* Z-index normal */
+}
+
+/* Conteneurs d'onglets - suppression des bordures */
+.nav-tabs-custom .nav-tabs {
+  background: white !important;
+}
+
+/* Conteneur principal des onglets - suppression bordures et ombres */
+.nav-tabs-custom {
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: white !important;
+}
+
+/* Contenu des onglets - suppression bordures */
+.tab-content {
+  border: none !important;
+  background: white !important;
+  border-top: none !important;
+}
+
+/* Navigation des onglets - disposition flex horizontale */
+.nav-tabs {
+  border-top: none !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Items d'onglets - éléments individuels */
+.nav-tabs > li {
+  border-top: none !important;
+  display: inline-block !important;
+  margin-right: 2px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Liens des onglets - style de base */
+.nav-tabs > li > a {
+  border-top: none !important;
+  color: #044a5d !important;
+  display: inline-block !important;
+  padding: 10px 15px !important;
+  white-space: nowrap !important; 
+}
+
+/* Onglet actif - couleur de fond et texte blanc */
+.nav-tabs > li.active > a {
+  border-top: none !important;
+  background-color: #044a5d34 !important;
+  color: white !important;
+}
+
+/* Survol des onglets */
+.nav-tabs > li > a:hover {
+  border-top: none !important;
+  border-bottom: 2px solid #ccc !important;
+  background-color: #f8f9fa !important;
+  text-decoration: none !important;
+}
+
+/* Bordure sous les onglets - ligne de séparation personnalisée */
+.nav-tabs {
+  border-bottom: 2px solid #ccc !important;
+  margin-bottom: 15px !important;
+}
+
+/* Footer et éléments de bas de page - fond blanc uniforme */
+footer,
+.footer,
+.main-footer,
+.content-wrapper,
+.wrapper,
+body {background-color: white !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-top: none !important;
+}
+
+/* Suppression complète des boutons hamburgers - tous types */
+.main-header .navbar-toggle,
+.main-header .sidebar-toggle,
+.navbar-toggle,
+.sidebar-toggle,
+.main-header .navbar-custom-menu .navbar-toggle,
+.main-header .navbar-header .navbar-toggle,
+.main-header button,
+.main-header .btn,
+.main-header [class*="toggle"],
+.main-header [class*="hamburger"],
+.main-header .fa-bars,
+.main-header .glyphicon-menu-hamburger,
+.main-header [data-toggle],
+.navbar-header button,
+.navbar-right button,
+.navbar-collapse button,
+.main-header .control-sidebar-toggle,
+button[data-toggle="push-menu"],
+a[data-toggle="push-menu"],
+.skin-blue .main-header .navbar .sidebar-toggle {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  overflow: hidden !important;
+}
+
+/* Forcer la navbar à ne pas afficher le toggle */
+.navbar-header .navbar-toggle {
+  display: none !important;
+}
+
+/* S'assurer qu'aucun bouton hamburger n'apparaît  */
+button.navbar-toggle,
+.btn.navbar-toggle,
+[data-toggle="offcanvas"],
+[data-toggle="collapse"],
+[data-toggle="push-menu"],
+.navbar-btn,
+.main-header .navbar-btn,
+.main-header .pull-right button,
+.main-header .pull-left button {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* SUPPRESSION ABSOLUE - tous les boutons dans le header */
+.main-header *:not(.logo):not(.navbar-brand):not(span):not(h1):not(h2):not(h3):not(h4):not(h5):not(h6):not(.navbar-header) {
+  display: none !important;
+}
+
+/* Forcer seulement le logo/titre à être visible */
+.main-header .logo,
+.main-header .navbar-brand,
+.main-header h4,
+.main-header span,
+.main-header .navbar-header {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Cacher spécifiquement tous les éléments interactifs sauf le titre */
+.main-header .navbar-nav,
+.main-header .navbar-custom-menu,
+.main-header .navbar-right,
+.main-header .navbar-left,
+.main-header .dropdown,
+.main-header .dropdown-toggle,
+.main-header ul,
+.main-header li:not(.logo),
+.main-header .nav {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* AdminLTE specific - forcer la suppression */
+.skin-blue .main-header .navbar .sidebar-toggle:hover {
+  display: none !important;
+}
+
+/* Version mobile - sidebar toujours visible et fonctionnelle */
+@media (max-width: 768px) {
+  /* Suppression du bouton hamburger sur mobile aussi */
+  .navbar-toggle,
+  .sidebar-toggle,
+  .main-header .navbar-toggle,
+  .main-header .sidebar-toggle {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Sidebar horizontale maintenue sur mobile */
+  .main-sidebar {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    transform: none !important;
+    left: 0 !important;
+    margin-left: 0 !important;
+  }
+  
+  /* Menu horizontal adapté pour mobile */
+  .sidebar-menu {
+    flex-direction: row !important;
+    padding: 5px 10px !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  .sidebar-menu > li {
+    flex: 1 !important;
+    border-right: 1px solid #555 !important;
+    height: auto !important;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  .sidebar-menu > li:last-child {
+    border-right: none !important;
+  }
+  
+  .sidebar-menu > li > a {
+    padding: 12px 8px !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  /* Layout responsive pour contenu principal */
+  .content-wrapper {
+    margin-left: 0 !important;
+    padding: 10px !important;
+    padding-bottom: 50px !important;
+    transform: none !important;
+    left: 0 !important;
+  }
+  
+  /* Empêcher le décalage du contenu sur mobile */
+  body.sidebar-collapse .content-wrapper,
+  body.sidebar-open .content-wrapper {
+    margin-left: 0 !important;
+    transform: none !important;
+  }
+  
+  /* Sidebar toujours visible sur mobile */
+  .sidebar-collapse .main-sidebar,
+  .sidebar-open .main-sidebar {
+    transform: none !important;
+    left: 0 !important;
+    position: relative !important;
+  }
+  
+  /* Forcer le body à ne pas bouger */
+  body {
+    overflow-x: hidden !important;
+  }
+  
+  /* Cacher ABSOLUMENT la barre verticale sur mobile - priorité maximale */
+  body::after,
+  body.show-vertical-bar::after {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  /* Colonnes en vertical sur mobile */
+  .row {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .col-md-6,
+  .col-sm-6,
+  [class*="col-"] {
+    width: 100% !important;
+    margin-bottom: 20px !important;
+  }
+  
+  /* Onglets en vertical sur mobile */
+  .nav-tabs {
+    flex-direction: column !important;
+    border-bottom: none !important;
+  }
+  
+  .nav-tabs > li {
+    width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 2px !important;
+  }
+  
+  .nav-tabs > li > a {
+    text-align: center !important;
+    border-radius: 4px !important;
+  }
+  
+  
+  /* Header responsive mobile */
+  .main-header {
+    padding: 15px 10px !important;
+    height: auto !important;
+    min-height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+  
+  .main-header .navbar-brand,
+  .main-header h4,
+  .main-header span,
+  .main-header .logo,
+  .main-header .navbar-header {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+    padding: 5px !important;
+    display: block !important;
+    text-align: center !important;
+    overflow-wrap: break-word !important;
+    color: white !important;
+    background-color: #05506d !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Version tablette et très petits écrans - optimisations finales */
+@media (max-width: 992px) {
+  .content-wrapper {
+    padding: 15px !important;
+  }
+  
+  /* Barre verticale plus fine sur tablette */
+  body::after {
+    width: 1px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header {
+    padding: 10px 5px !important;
+    min-height: 90px !important;
+  }
+  
+  .main-header .navbar-brand,
+  .main-header h4,
+  .main-header span {
+    font-size: 12px !important;
+    padding: 5px !important;
+    line-height: 1.3 !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  .sidebar-menu > li > a {
+    padding: 10px 5px !important;
+    font-size: 11px !important;
+  }
+  
+  .content-wrapper {
+    padding: 8px !important;
+    padding-bottom: 60px !important;
+    min-height: calc(100vh - 150px) !important;
+  }
+  
+  .nav-tabs > li > a {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+  
+  /* Espacement supplémentaire en bas de page */
+  .tab-content {
+    padding-bottom: 30px !important;
+  }
+  
+  .content > *:last-child,
+  .tab-pane > *:last-child {
+    margin-bottom: 30px !important;
+  }
+  
+  /* Cacher ABSOLUMENT la barre verticale sur très petits écrans aussi */
+  body::after,
+  body.show-vertical-bar::after {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
+/* ===== RADIO BUTTONS - Style personnalisé type boutons ===== */
+
+/* Conteneur d'options radio - disposition horizontale pour les boutons */
+.shiny-input-radiogroup .shiny-options-group {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  margin-top: 6px !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
+  line-height: 1 !important;
+}
+
+/* Input radio - complètement caché mais fonctionnel */
+.shiny-input-radiogroup input[type="radio"] {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Labels des questions - style normal (pas de transformation en bouton) */
+.shiny-input-radiogroup > label:first-child {
+  display: block !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+  color: #333 !important;
+  margin-bottom: 6px !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: default !important;
+  transform: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  min-width: auto !important;
+  text-align: left !important;
+}
+
+/* Tous les labels dans le conteneur des options - vrais boutons */
+.shiny-input-radiogroup .shiny-options-group label,
+.shiny-input-radiogroup label:not(:first-child) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px 16px !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #333 !important;
+  background-color: #f8f9fa !important;
+  border: 2px solid #d3d9df !important;
+  border-radius: 5px !important;
+  transition: all 0.1s ease !important;
+  min-width: 70px !important;
+  text-align: center !important;
+  user-select: none !important;
+  line-height: 1 !important;
+  height: 32px !important;
+  box-sizing: border-box !important;
+  vertical-align: top !important;
+  position: relative !important;
+  top: 0 !important;
+}
+
+/* Survol des boutons de réponse - effet orange */
+.shiny-input-radiogroup .shiny-options-group label:hover,
+.shiny-input-radiogroup label:not(:first-child):hover {
+  background-color: #fff2e6 !important;
+  border-color: #d9632b !important;
+  color: #d9632b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(217, 99, 43, 0.2) !important;
+}
+
+/* Bouton de réponse sélectionné - style actif avec classe JavaScript */
+.shiny-input-radiogroup label.radio-selected {
+  background-color: #05506d !important;
+  border-color: #05506d !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 6px rgba(5, 80, 109, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Survol du bouton sélectionné - maintien du style actif */
+.shiny-input-radiogroup label.radio-selected:hover {
+  background-color: #044a5d !important;
+  border-color: #044a5d !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(5, 80, 109, 0.4) !important;
+}
+
+/* Focus sur les boutons */
+.shiny-input-radiogroup label.radio-selected:focus,
+.shiny-input-radiogroup .shiny-options-group label:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(5, 80, 109, 0.2) !important;
+}
+
+/* Animation sur clic des boutons de réponse */
+.shiny-input-radiogroup .shiny-options-group label:active,
+.shiny-input-radiogroup label:not(:first-child):active {
+  transform: translateY(0px) !important;
+  transition: transform 0.1s ease !important;
+}
+
+/* Fallback pour les sélecteurs CSS natifs (au cas où) */
+.shiny-input-radiogroup input[type="radio"]:checked + label {
+  background-color: #05506d !important;
+  border-color: #05506d !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 6px rgba(5, 80, 109, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Responsive mobile - boutons de réponse plus petits */
+@media (max-width: 768px) {
+  .shiny-input-radiogroup .shiny-options-group {
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .shiny-input-radiogroup .shiny-options-group label,
+  .shiny-input-radiogroup label:not(:first-child) {
+    padding: 5px 12px !important;
+    font-size: 13px !important;
+    min-width: 60px !important;
+    border-radius: 4px !important;
+    height: 28px !important;
+  }
+  
+  /* Labels des questions restent normaux sur mobile */
+  .shiny-input-radiogroup > label:first-child {
+    font-size: 15px !important;
+    margin-bottom: 5px !important;
+  }
+}
+
+/* Responsive très petit écran - boutons de réponse empilés */
+@media (max-width: 480px) {
+  .shiny-input-radiogroup .shiny-options-group {
+    flex-direction: column !important;
+    gap: 5px !important;
+    align-items: stretch !important;
+  }
+  
+  .shiny-input-radiogroup .shiny-options-group label,
+  .shiny-input-radiogroup label:not(:first-child) {
+    width: 100% !important;
+    min-width: auto !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    height: 30px !important;
+  }
+}
+
+/* ===== FIN RADIO BUTTONS PERSONNALISÉS ===== */
+
+/* ===== ESPACEMENT COLONNES - Layout asymétrique des questions ===== */
+
+/* Colonnes de gauche - plus proches du bord gauche */
+.col-md-6:first-child,
+.col-sm-6:first-child {
+  padding-left: 5px !important; /* Colonne gauche plus à gauche */
+  padding-right: 40px !important;
+}
+
+/* Colonnes de droite - plus proches du bord droit */
+.col-md-6:last-child,
+.col-sm-6:last-child {
+  padding-left: 30px !important;
+  padding-right: 10px !important; /* Colonne droite plus à droite */
+}
+
+/* Espacement des groupes radio dans colonnes */
+.col-md-6 .shiny-input-radiogroup,
+.col-sm-6 .shiny-input-radiogroup {
+  margin-bottom: 25px !important;
+  padding: 0 15px !important;
+}
+
+/* Espacement entre questions avec boutons - plus d'espace vertical */
+.shiny-input-radiogroup {
+  margin-bottom: 20px !important;
+}
+
+/* Labels de questions - espacement des titres */
+.control-label {
+  margin-bottom: 12px !important;
+  padding: 0 5px !important;
+}
+
+/* Colonnes responsive tablette - espacement adapté */
+@media (max-width: 992px) {
+  .col-md-6:first-child,
+  .col-sm-6:first-child {
+    padding-left: 5px !important;
+    padding-right: 20px !important;
+  }
+  
+  .col-md-6:last-child,
+  .col-sm-6:last-child {
+    padding-left: 20px !important;
+    padding-right: 5px !important; /* Plus à droite sur tablette aussi */
+  }
+}
+
+/* Colonnes responsive mobile - espacement uniforme */
+@media (max-width: 768px) {
+  .col-md-6:first-child,
+  .col-sm-6:first-child {
+    padding-left: 5px !important;
+    padding-right: 10px !important;
+    margin-bottom: 25px !important;
+  }
+  
+  .col-md-6:last-child,
+  .col-sm-6:last-child {
+    padding-left: 10px !important;
+    padding-right: 5px !important; /* Plus à droite sur mobile aussi */
+    margin-bottom: 25px !important;
+  }
+  
+  .col-md-6 .shiny-input-radiogroup,
+  .col-sm-6 .shiny-input-radiogroup {
+    padding: 0 5px !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* ===== FIN ESPACEMENT DES COLONNES ===== */
+

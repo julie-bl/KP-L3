@@ -54,7 +54,9 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
-    # includeCSS("styles.css"),  # Inclure le fichier CSS
+    includeCSS("styles.css"),  # Inclure le fichier CSS
+    includeScript("style_js.js"),  # Inclure le fichier JavaScript
+
     tabItems(
       tabItem(tabName = "one",
               tabBox(tabPanel(h4("The patient characteristics",style = "color: #2874A6;")),
